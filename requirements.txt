@@ -1,0 +1,7 @@
+jupyter==1.0.0
+matplotlib==3.3.3
+MetaTrader5==5.0.33
+numpy==1.19.3
+pandas==1.1.4
+pytz==2020.4
+ta==0.6.1
