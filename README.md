@@ -4,6 +4,12 @@
 
 1. Install [Metatrader 5](https://www.metatrader5.com)
 
+1. Edit home project directory on config module:
+    ```ini
+    [APP]
+    home=C:/Users/tenta/Documents/Projetos/investing-broker
+   ```
+
 1. Run commands:
     ```sh
     conda create -n investing-broker python=3.6.12
