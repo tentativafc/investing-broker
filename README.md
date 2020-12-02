@@ -10,7 +10,13 @@
     conda activate investing-broker
     pip install -r requirements.txt
     jupyter notebook notebooks
+    docker-compose up -d
     ```
+
+1. Install ortisan-investing-lib:
+    ```sh
+    pip install -e ./ortisan-investing-lib --user
+   ```
 
 1. Run your Analysis: http://localhost:8888
 

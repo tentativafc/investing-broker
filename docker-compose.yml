@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  postgres:
+    image: 'postgres:11.2-alpine'
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=123456
+    volumes:
+      - ./docker/postgres-data/prod:/var/lib/postgresql/data
+      - ./db-init-scripts:/docker-entrypoint-initdb.d
+    ports:
+      - '5432:5432'
+
+  postgres_teste:
+    image: 'postgres:11.2-alpine'
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=123456
+    volumes:
+      - ./docker/postgres-data/dev:/var/lib/postgresql/data
+      - ./db-init-scripts:/docker-entrypoint-initdb.d
+    ports:
+      - '5433:5432'
+#  app:
+#    build:
+#      dockerfile: Dockerfile
+#      context: .
+#    environment:
+#      - BOLSA_PROJECT_HOME=/app
+#    ports:
+#      - '8888:8888'
+#    depends_on:
+#      - rabbitmq
+#      - postgres
+#      - postgres_teste
+#    volumes:
+#      - /app/docker
+#      - .:/app
