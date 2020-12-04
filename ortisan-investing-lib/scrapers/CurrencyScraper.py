@@ -7,7 +7,7 @@ from urllib.error import HTTPError
 import os
 
 
-class CurrencyScrapper(object):
+class CurrencyScraper(object):
     CURRENCIES = [
         (61, 'Dólar'),
         (222, 'Euro'),
@@ -46,5 +46,5 @@ if __name__ == '__main__':
     init_date = datetime.datetime(2007, 1, 1)
     final_date = datetime.datetime(2020, 12, 3)
 
-    scrapper = CurrencyScrapper()
+    scrapper = CurrencyScraper()
     scrapper.import_by_period(init_date, final_date, override=True)
