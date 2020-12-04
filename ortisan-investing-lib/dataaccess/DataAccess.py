@@ -5,13 +5,13 @@ from abc import ABCMeta, abstractmethod
 
 import numpy as np
 import pandas as pd
+from datetime import datetime
+import MetaTrader5 as mt5
 from model.Daos import AssetQuotationDao, CoinQuotationDao
 from utils.DateUtils import DateUtils
 
-
 class DataSource(object):
     POSTGRES = 'Postgres'
-
 
 class DataItem(object):
     DATE = 'Date'
@@ -21,6 +21,7 @@ class DataItem(object):
     LOW = 'Low'
     VOLUME = 'Volume'
     ADJUSTED_CLOSE = 'Adj Close'
+    SPREAD = 'Spread'
 
     @staticmethod
     def get_list():
@@ -135,6 +136,23 @@ class PostgresDataProvider(__AbstractDataProvider):
             dict_data[coin] = df_result
 
         return dict_data
+
+class MetaTraderDataAccess:
+    def __init__(self):
+        if not mt5.initialize():
+            print("initialize() failed, error code =", mt5.last_error())
+            raise Exception("Error to connect to Metatrader.", mt5.last_error())
+
+    def get_rates_from_symbol(self, symbol, date_from, date_to, timeframe=mt5.TIMEFRAME_M5):
+        rates = mt5.copy_rates_range(symbol, timeframe, date_from, date_to)
+        df = pd.DataFrame(rates)
+        if df.empty:
+            return df
+        df.time = df.time.transform([datetime.fromtimestamp])
+        df.drop(['tick_volume'], axis=1, inplace=True)
+        df.columns = [DataItem.DATE, DataItem.OPEN, DataItem.HIGH, DataItem.LOW, DataItem.CLOSE, DataItem.SPREAD, DataItem.VOLUME]
+        df.set_index(DataItem.DATE, inplace=True)
+        return df
 
 
 if __name__ == '__main__':
