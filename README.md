@@ -21,7 +21,7 @@
 
 1. Install ortisan-investing-lib:
     ```sh
-    pip install -e ./ortisan-investing-lib --user
+    pip install -e ./ortisan-ta --user
    ```
 
 1. Run your Analysis: http://localhost:8888

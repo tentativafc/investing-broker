@@ -5,4 +5,4 @@
 data/**/COTAHIST*
 docker/**
 /**/Bolsa.egg-info
-ortisan-investing-lib/OrtisanInvestingLib.egg-info/**
+ortisan-ta/ortisan_ta.egg-info/**
