@@ -1,5 +1,23 @@
 # Investiment Broker
 
+## Frontend
+
+```sh
+cd ./app/frontend/app
+
+npm run serve
+```
+
+## Backend
+
+```sh
+cd ./app/backend/user-rest
+docker-compose up
+go run main.go
+```
+
+## Analytics
+
 ### Environment
 
 1. Install [Metatrader 5](https://www.metatrader5.com)
@@ -7,7 +25,7 @@
 1. Edit home project directory on config module:
     ```ini
     [APP]
-    home=C:/Users/tenta/Documents/Projetos/investing-broker
+    home=C:/Users/tenta/Documents/Projetos/investing-broker/analytics
    ```
 
 1. Run commands:
