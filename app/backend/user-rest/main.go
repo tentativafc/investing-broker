@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"gorm.io/driver/postgres"
@@ -13,6 +14,8 @@ import (
 	guuid "github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 var db *gorm.DB
@@ -23,6 +26,23 @@ type User struct {
 	Lastname  string `json:"lastname,omitempty"`
 	Email     string `json:"email,omitempty"`
 	Password  string `json:"password,omitempty"`
+}
+
+type UserResponse struct {
+	ID        string `json:"id,omitempty"`
+	Firstname string `json:"firstname,omitempty"`
+	Lastname  string `json:"lastname,omitempty"`
+	Email     string `json:"email,omitempty"`
+}
+
+type LoginData struct {
+	Email    string `json:"email,omitempty"`
+	Password string `json:"password,omitempty"`
+}
+
+type LoginResponse struct {
+	Token    string        `json:"auth_token,omitempty"`
+	UserData *UserResponse `json:"user,omitempty"`
 }
 
 type UserDB struct {
@@ -54,6 +74,23 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
+func Login(w http.ResponseWriter, r *http.Request) {
+
+	var login LoginData
+	_ = json.NewDecoder(r.Body).Decode(&login)
+
+	var userDb UserDB
+	if err := db.Where("email = ?", login.Email).First(&userDb).Error; err != nil {
+		w.WriteHeader(401)
+	} else {
+		userResponse := UserResponse{ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email}
+		// TODO error handler
+		token, _ := CreateToken(userResponse.ID)
+		loginResponse := LoginResponse{Token: token, UserData: &userResponse}
+		json.NewEncoder(w).Encode(&loginResponse)
+	}
+}
+
 func GetUsersByEmail(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	var email = params["email"]
@@ -81,6 +118,7 @@ func handleRequests() {
 	router := mux.NewRouter()
 	router.HandleFunc("/", Home).Methods("GET")
 	router.HandleFunc("/users", CreateUser).Methods("POST")
+	router.HandleFunc("/users/login", Login).Methods("POST")
 	router.HandleFunc("/users/{id}", GetUserById).Methods("GET")
 	router.HandleFunc("/users", GetUsersByEmail).Queries("email", "{email}").Methods("GET")
 
@@ -97,6 +135,22 @@ func dbConfig() {
 		panic("failed to connect database")
 	}
 	db.AutoMigrate(&UserDB{})
+}
+
+func CreateToken(userId string) (string, error) {
+	var err error
+	//Creating Access Token
+	os.Setenv("ACCESS_SECRET", "mamaandtito") //this should be in an env file
+	atClaims := jwt.MapClaims{}
+	atClaims["authorized"] = true
+	atClaims["user_id"] = userId
+	atClaims["exp"] = time.Now().Add(time.Minute * 15).Unix()
+	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
+	token, err := at.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }
 
 func main() {
