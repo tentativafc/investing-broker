@@ -19,14 +19,14 @@
                                         <p class="text-muted mb-4">Enter your email address and password to access admin panel.</p>
                                         <form class="user">
                                             <div class="form-group">
-                                                <input type="email" class="form-control form-control-user" id="exampleInputEmail" placeholder="Email Address">
+                                                <input type="email" class="form-control form-control-user" id="exampleInputEmail" placeholder="Email Address" v-model="user.email">
                                             </div>
                                             <div class="form-group">
-                                                <input type="password" class="form-control form-control-user" id="exampleInputPassword" placeholder="Password">
+                                                <input type="password" class="form-control form-control-user" id="exampleInputPassword" placeholder="Password" v-model="user.password">
                                             </div>
                                             <a href="" class="btn btn-success btn-block"> Log In </a>
 
-                                            <div class="text-center mt-4">
+                                            <!-- <div class="text-center mt-4">
                                                 <h5 class="text-muted font-size-16">Sign in using</h5>
                                             
                                                 <ul class="list-inline mt-3 mb-0">
@@ -43,14 +43,14 @@
                                                         <a href="javascript: void(0);" class="social-list-item border-secondary text-secondary"><i class="mdi mdi-github-circle"></i></a>
                                                     </li>
                                                 </ul>
-                                            </div>
+                                            </div> -->
                                             
                                         </form>
 
                                         <div class="row mt-4">
                                             <div class="col-12 text-center">
                                                 <p class="text-muted mb-2"><a href="auth-recoverpw.html" class="text-muted font-weight-medium ml-1">Forgot your password?</a></p>
-                                                <p class="text-muted mb-0">Don't have an account? <a href="auth-register.html" class="text-muted font-weight-medium ml-1"><b>Sign Up</b></a></p>
+                                                <p class="text-muted mb-0">Don't have an account? <a href="/register" class="text-muted font-weight-medium ml-1"><b>Sign Up</b></a></p>
                                             </div> <!-- end col -->
                                         </div>
                                         <!-- end row -->
@@ -66,3 +66,28 @@
     </div>
     <!-- end page -->
 </template>
+
+<script>
+import { mapState } from "vuex";
+import { LOGIN } from "@/store/actions.type";
+export default {  
+  data() {
+    return {
+      email: null,
+      password: null
+    };
+  },
+  methods: {
+    onSubmit(email, password) {
+      this.$store
+        .dispatch(LOGIN, { email, password })
+        .then(() => this.$router.push({ name: "home" }));
+    }
+  },
+  computed: {
+    ...mapState({
+      errors: state => state.auth.errors
+    })
+  }
+};
+</script>

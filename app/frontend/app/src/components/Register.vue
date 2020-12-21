@@ -70,7 +70,7 @@
 
                                         <div class="row mt-4">
                                             <div class="col-12 text-center">
-                                                <p class="text-muted mb-0">Already have account?  <a href="auth-login.html" class="text-muted font-weight-medium ml-1"><b>Sign In</b></a></p>
+                                                <p class="text-muted mb-0">Already have account?  <a href="/login" class="text-muted font-weight-medium ml-1"><b>Sign In</b></a></p>
                                             </div> <!-- end col -->
                                         </div>
                                         <!-- end row -->
