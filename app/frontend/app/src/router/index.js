@@ -1,15 +1,17 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Register from '../components/Register.vue'
-import Login from '../components/Login.vue'
-import Home from '../components/Home.vue'
+import Register from "../components/Register.vue"
+import Login from "../components/Login.vue"
+import Recover from "../components/Recover.vue"
+import Home from "../components/Home.vue"
 
 Vue.use(VueRouter);
 
 const routes = [
-  { path: '/register', component: Register},      
-  { path: '/login', component: Login},      
-  { path: '/', component: Home}        
+  { name: "register", path: "/register", component: Register},      
+  { name: "login", path: "/login", component: Login},
+  { name: "recover", path: "/recover", component: Recover},
+  { name: "home", path: "/", component: Home}        
 ];
 
 const router = new VueRouter({

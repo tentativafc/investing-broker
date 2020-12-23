@@ -5,7 +5,8 @@ import {
   LOGOUT,
   REGISTER,
   CHECK_AUTH,
-  UPDATE_USER
+  UPDATE_USER,
+  FORGET_PASSWORD
 } from "./actions.type";
 import { SET_AUTH, PURGE_AUTH, SET_ERROR } from "./mutations.type";
 
@@ -43,6 +44,18 @@ const actions = {
       ApiService.post("users", { user: credentials })
         .then(({ data }) => {
           commit(SET_AUTH, data.user);
+          resolve(data);
+        })
+        .catch(({ response }) => {
+          commit(SET_ERROR, response.data.errors);
+          reject(response);
+        });
+    });
+  },
+  [FORGET_PASSWORD]({commit}, credentials) {
+    return new Promise((resolve, reject) => {
+      ApiService.post("users/recover", { ... credentials })
+        .then(({ data }) => {
           resolve(data);
         })
         .catch(({ response }) => {

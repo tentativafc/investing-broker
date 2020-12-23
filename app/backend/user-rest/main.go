@@ -40,6 +40,10 @@ type LoginData struct {
 	Password string `json:"password,omitempty"`
 }
 
+type RecoverLoginData struct {
+	Email string `json:"email,omitempty"`
+}
+
 type LoginResponse struct {
 	Token    string        `json:"auth_token,omitempty"`
 	UserData *UserResponse `json:"user,omitempty"`
@@ -57,6 +61,19 @@ type UserDB struct {
 
 func (UserDB) TableName() string {
 	return "user"
+}
+
+type RecoverLoginDB struct {
+	ID                string `gorm:"primarykey"`
+	UserID            string
+	User              UserDB `gorm:"foreignKey:UserID"`
+	TemporaryPassword string
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
+}
+
+func (RecoverLoginDB) TableName() string {
+	return "recover_password"
 }
 
 func Home(w http.ResponseWriter, r *http.Request) {
@@ -91,6 +108,23 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func RecoverLogin(w http.ResponseWriter, r *http.Request) {
+
+	var recover RecoverLoginData
+	_ = json.NewDecoder(r.Body).Decode(&recover)
+
+	var userDb UserDB
+	if err := db.Where("email = ?", recover.Email).First(&userDb).Error; err != nil {
+		w.WriteHeader(404)
+	} else {
+		ID := guuid.New().String()
+		tempPassword := guuid.New().String()
+		recoverLoginDB := RecoverLoginDB{ID: ID, UserID: userDb.ID, User: userDb, TemporaryPassword: tempPassword, CreatedAt: time.Now()}
+		db.Create(&recoverLoginDB)
+		w.WriteHeader(201)
+	}
+}
+
 func GetUsersByEmail(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	var email = params["email"]
@@ -119,6 +153,7 @@ func handleRequests() {
 	router.HandleFunc("/", Home).Methods("GET")
 	router.HandleFunc("/users", CreateUser).Methods("POST")
 	router.HandleFunc("/users/login", Login).Methods("POST")
+	router.HandleFunc("/users/recover", RecoverLogin).Methods("POST")
 	router.HandleFunc("/users/{id}", GetUserById).Methods("GET")
 	router.HandleFunc("/users", GetUsersByEmail).Queries("email", "{email}").Methods("GET")
 
@@ -135,6 +170,7 @@ func dbConfig() {
 		panic("failed to connect database")
 	}
 	db.AutoMigrate(&UserDB{})
+	db.AutoMigrate(&RecoverLoginDB{})
 }
 
 func CreateToken(userId string) (string, error) {

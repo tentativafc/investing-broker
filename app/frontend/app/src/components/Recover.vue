@@ -1,4 +1,3 @@
-
 <template>
     <div class="bg-primary">
         <div class="container">
@@ -12,25 +11,22 @@
                                     <div class="p-5">
                                         <div class="text-center">
                                             <a href="index.html" class="d-block mb-5">
-                                                <img src="assets/images/logo-dark.png" alt="app-logo" height="18" />
+                                                <img src="assets/images/logo-dark.png" alt="app-logo" height="18">
                                             </a>
                                         </div>
-                                        <h1 class="h5 mb-1">Welcome Back!</h1>
-                                        <p class="text-muted mb-4">Enter your email address and password to access admin panel.</p>
-                                        <form class="user" >
-                                            <div class="form-group">
-                                                <input type="email" class="form-control form-control-user" id="exampleInputEmail" placeholder="Email Address" v-model="email">
-                                            </div>
-                                            <div class="form-group">
-                                                <input type="password" class="form-control form-control-user" id="exampleInputPassword" placeholder="Password" v-model="password">
-                                            </div>
-                                            <a href="" class="btn btn-success btn-block" v-on:click="validateAndSubmit"> Log In </a>
-                                            
-                                        </form>
+                                        <h1 class="h5 mb-1">Reset Password</h1>
+                                        <p class="text-muted mb-4">Enter your email address and we'll send you an email with instructions to reset your password.</p>
 
-                                        <div class="row mt-4">
+                                        <div class="form-group">
+                                            <label for="exampleInputEmail">Email Address</label>
+                                            <input type="email" class="form-control form-control-user" id="exampleInputEmail" placeholder="Email Address" v-model="email">
+                                        </div>
+                                        <a href="" class="btn btn-success btn-block" v-on:click="validateAndSubmit"> Log In </a>
+                                            
+
+                                        <div class="row mt-5">
                                             <div class="col-12 text-center">
-                                                <p class="text-muted mb-2"><a href="/recover" class="text-muted font-weight-medium ml-1">Forgot your password?</a></p>
+                                                <p class="text-muted">Already have account?  <a href="/login" class="text-muted font-weight-medium ml-1"><b>Sign In</b></a></p>
                                                 <p class="text-muted mb-0">Don't have an account? <a href="/register" class="text-muted font-weight-medium ml-1"><b>Sign Up</b></a></p>
                                             </div> <!-- end col -->
                                         </div>
@@ -45,30 +41,23 @@
         </div>
         <!-- end container -->
     </div>
-    <!-- end page -->
 </template>
 
 <script>
 import { mapState } from "vuex";
-import { LOGIN } from "@/store/actions.type";
+import { FORGET_PASSWORD } from "@/store/actions.type";
 export default {  
   data() {
     return {
       email: null,
-      password: null
     };
   },
   methods: {
     validateAndSubmit: function(e) {
          e.preventDefault();
-        this.$store.dispatch(LOGIN, { "email": this.email, "password" : this.password })
-        .then(() => this.$router.push({ name: "home" }));
+        this.$store.dispatch(FORGET_PASSWORD, { "email": this.email })
+        .then(() => this.$router.push({ name: "login" }));
     }
-
-    // onSubmit(email, password) {
-    //   this.$store.dispatch(LOGIN, { email, password })
-    //     .then(() => this.$router.push({ name: "home" }));
-    // }
   },
   computed: { 
     ...mapState({

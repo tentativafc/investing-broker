@@ -20,7 +20,6 @@ const ApiService = {
   },
 
   get(resource, slug = "") {
-    console.log("ABACUQUE");
     return Vue.axios.get(`${resource}/${slug}`).catch(error => {
       throw new Error(`ApiService ${error}`);
     });
