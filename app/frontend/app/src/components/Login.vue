@@ -17,14 +17,14 @@
                                         </div>
                                         <h1 class="h5 mb-1">Welcome Back!</h1>
                                         <p class="text-muted mb-4">Enter your email address and password to access admin panel.</p>
-                                        <form class="user">
+                                        <form class="user" >
                                             <div class="form-group">
-                                                <input type="email" class="form-control form-control-user" id="exampleInputEmail" placeholder="Email Address" v-model="user.email">
+                                                <input type="email" class="form-control form-control-user" id="exampleInputEmail" placeholder="Email Address" v-model="email">
                                             </div>
                                             <div class="form-group">
-                                                <input type="password" class="form-control form-control-user" id="exampleInputPassword" placeholder="Password" v-model="user.password">
+                                                <input type="password" class="form-control form-control-user" id="exampleInputPassword" placeholder="Password" v-model="password">
                                             </div>
-                                            <a href="" class="btn btn-success btn-block"> Log In </a>
+                                            <a href="" class="btn btn-success btn-block" v-on:click="validateAndSubmit"> Log In </a>
 
                                             <!-- <div class="text-center mt-4">
                                                 <h5 class="text-muted font-size-16">Sign in using</h5>
@@ -78,13 +78,18 @@ export default {
     };
   },
   methods: {
-    onSubmit(email, password) {
-      this.$store
-        .dispatch(LOGIN, { email, password })
+    validateAndSubmit: function(e) {
+         e.preventDefault();
+        this.$store.dispatch(LOGIN, { "email": this.email, "password" : this.password })
         .then(() => this.$router.push({ name: "home" }));
     }
+
+    // onSubmit(email, password) {
+    //   this.$store.dispatch(LOGIN, { email, password })
+    //     .then(() => this.$router.push({ name: "home" }));
+    // }
   },
-  computed: {
+  computed: { 
     ...mapState({
       errors: state => state.auth.errors
     })

@@ -122,7 +122,7 @@ func handleRequests() {
 	router.HandleFunc("/users/{id}", GetUserById).Methods("GET")
 	router.HandleFunc("/users", GetUsersByEmail).Queries("email", "{email}").Methods("GET")
 
-	handler := cors.Default().Handler(router)
+	handler := cors.AllowAll().Handler(router)
 
 	log.Fatal(http.ListenAndServe(":8081", handler))
 }

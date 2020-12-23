@@ -47,7 +47,7 @@
                                             </div>
                                             <a href="" class="btn btn-success btn-block" v-on:click="validateAndSubmit"> Register Account </a>
 
-                                            <div class="text-center mt-4">
+                                            <!-- <div class="text-center mt-4">
                                                 <h5 class="text-muted font-size-16">Sign up using</h5>
                                             
                                                 <ul class="list-inline mt-3 mb-0">
@@ -64,7 +64,7 @@
                                                         <a href="javascript: void(0);" class="social-list-item border-secondary text-secondary"><i class="mdi mdi-github-circle"></i></a>
                                                     </li>
                                                 </ul>
-                                            </div>
+                                            </div> -->
                                             
                                         </form>
 

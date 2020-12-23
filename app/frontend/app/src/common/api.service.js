@@ -1,7 +1,7 @@
 import axios from "axios";
 import Vue from "vue";
 import VueAxios from "vue-axios";
-import JwtService from "@/common/jwt.service";
+import LoginService from "@/common/login.service";
 import { API_URL } from "@/common/config";
 
 const ApiService = {
@@ -10,7 +10,7 @@ const ApiService = {
     Vue.axios.defaults.baseURL = API_URL;
   },
   setHeader() {
-    Vue.axios.defaults.headers.common["Authorization"] = `Token ${JwtService.getToken()}`;
+    Vue.axios.defaults.headers.common["Authorization"] = `Token ${LoginService.getToken()}`;
   },
 
   query(resource, params) {
@@ -20,6 +20,7 @@ const ApiService = {
   },
 
   get(resource, slug = "") {
+    console.log("ABACUQUE");
     return Vue.axios.get(`${resource}/${slug}`).catch(error => {
       throw new Error(`ApiService ${error}`);
     });
@@ -45,26 +46,3 @@ const ApiService = {
 };
 
 export default ApiService;
-
-export const TagsService = {
-  get() {
-    return ApiService.get("tags");
-  }
-};
-
-export const RegisterService = {
-  query(type, params) {
-    return ApiService.query("users" + (type === "feed" ? "/feed" : ""), {
-      params: params
-    });
-  },
-  get(slug) {
-    return ApiService.get("users", slug);
-  },
-  create(params) {
-    return ApiService.post("users", { article: params });
-  },
-  update(slug, params) {
-    return ApiService.update("users", slug, { article: params });
-  }
-};
