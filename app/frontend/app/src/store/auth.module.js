@@ -1,5 +1,7 @@
 import ApiService from "@/common/api.service";
 import LoginService from "@/common/login.service";
+import router from "../router";
+
 import {
   LOGIN,
   LOGOUT,
@@ -113,6 +115,7 @@ const mutations = {
     state.user = {};
     state.errors = {};
     LoginService.destroy();
+    router.go("/")
   }
 };
 
