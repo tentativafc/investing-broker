@@ -16,6 +16,8 @@ docker-compose up
 go run main.go
 ```
 
+Postman collection of project: investing.postman_collection.json
+
 ## Analytics
 
 ### Environment

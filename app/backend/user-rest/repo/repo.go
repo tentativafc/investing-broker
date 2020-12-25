@@ -10,9 +10,9 @@ import (
 
 type UserDB struct {
 	ID        string `gorm:"primarykey"`
-	Firstname string
-	Lastname  string
-	Email     string `gorm:"uniqueIndex"`
+	Firstname string `gorm:"not null"`
+	Lastname  string `gorm:"not null"`
+	Email     string `gorm:"not null,unique,uniqueIndex"`
 	Password  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -26,7 +26,7 @@ type RecoverLoginDB struct {
 	ID                string `gorm:"primarykey"`
 	UserID            string
 	User              UserDB `gorm:"foreignKey:UserID"`
-	TemporaryPassword string
+	TemporaryPassword string `gorm:"not null"`
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
 }
@@ -39,9 +39,12 @@ type UserRepository struct {
 	db *gorm.DB
 }
 
-func (ur UserRepository) CreateUser(u UserDB) UserDB {
-	ur.db.Create(&u)
-	return u
+func (ur UserRepository) CreateUser(u UserDB) (UserDB, error) {
+	err := ur.db.Create(&u).Error
+	if err != nil {
+		return UserDB{}, err
+	}
+	return u, nil
 }
 
 func (ur UserRepository) FindByEmail(email string) (UserDB, error) {
@@ -57,10 +60,10 @@ func (ur UserRepository) FindById(userId string) (UserDB, error) {
 	return userDb, err
 }
 
-func (ur UserRepository) CreateRecoverPassword(u UserDB, id uuid.UUID, tempPassword string) RecoverLoginDB {
+func (ur UserRepository) CreateRecoverPassword(u UserDB, id uuid.UUID, tempPassword string) (RecoverLoginDB, error) {
 	recoverLoginDB := RecoverLoginDB{ID: id.String(), UserID: u.ID, User: u, TemporaryPassword: tempPassword, CreatedAt: time.Now()}
-	ur.db.Create(&recoverLoginDB)
-	return recoverLoginDB
+	err := ur.db.Create(&recoverLoginDB).Error
+	return recoverLoginDB, err
 }
 
 func NewUserRepository() UserRepository {

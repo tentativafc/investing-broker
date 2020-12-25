@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"github.com/tentativafc/investing-broker/user-rest/dto"
+	errorUR "github.com/tentativafc/investing-broker/user-rest/error"
 	"github.com/tentativafc/investing-broker/user-rest/repo"
 	"github.com/tentativafc/investing-broker/user-rest/service"
 )
@@ -21,21 +22,25 @@ func Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	var user dto.User
-	_ = json.NewDecoder(r.Body).Decode(&user)
-	user = us.CreateUser(user)
-	json.NewEncoder(w).Encode(user)
+	var u dto.User
+	_ = json.NewDecoder(r.Body).Decode(&u)
+	u, err := us.CreateUser(u)
+	if err != nil {
+		HandleError(err, w)
+	} else {
+		json.NewEncoder(w).Encode(&u)
+	}
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
-	var login dto.LoginData
-	_ = json.NewDecoder(r.Body).Decode(&login)
+	var l dto.LoginData
+	_ = json.NewDecoder(r.Body).Decode(&l)
 
-	var loginResponse, err = us.Login(login)
+	lr, err := us.Login(l)
 	if err != nil {
-		w.WriteHeader(401)
+		HandleError(err, w)
 	} else {
-		json.NewEncoder(w).Encode(&loginResponse)
+		json.NewEncoder(w).Encode(&lr)
 	}
 }
 
@@ -44,25 +49,38 @@ func RecoverLogin(w http.ResponseWriter, r *http.Request) {
 	var recoverLoginData dto.RecoverLoginData
 	_ = json.NewDecoder(r.Body).Decode(&recoverLoginData)
 
-	var recoverLoginDataResponse, err = us.RecoverLogin(recoverLoginData)
+	rl, err := us.RecoverLogin(recoverLoginData)
 	if err != nil {
-		w.WriteHeader(404)
+		HandleError(err, w)
 	} else {
-		json.NewEncoder(w).Encode(&recoverLoginDataResponse)
+		json.NewEncoder(w).Encode(&rl)
 		w.WriteHeader(201)
 	}
 }
 
 func GetUserById(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	var userId = params["id"]
+	var uId = params["id"]
 	authorization := r.Header.Get("Authorization")
-	userResponse, err := us.GetuserById(authorization, userId)
+	u, err := us.GetuserById(authorization, uId)
 	if err != nil {
-		w.WriteHeader(404)
+		HandleError(err, w)
 	} else {
-		json.NewEncoder(w).Encode(&userResponse)
+		json.NewEncoder(w).Encode(&u)
 	}
+}
+
+func HandleError(err error, w http.ResponseWriter) {
+	switch err.(type) {
+	case *errorUR.NotFoundError:
+		w.WriteHeader(404)
+	case *errorUR.AuthError:
+		w.WriteHeader(401)
+	default:
+		w.WriteHeader(500)
+	}
+	json.NewEncoder(w).Encode(dto.ErrorResponse{Msg: err.Error()})
+
 }
 
 func HandleRequests() {

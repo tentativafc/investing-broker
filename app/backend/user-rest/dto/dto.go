@@ -33,3 +33,7 @@ type RecoverLoginDataResponse struct {
 	ID    string `json:"id,omitempty"`
 	Email string `json:"email,omitempty"`
 }
+
+type ErrorResponse struct {
+	Msg string `json:"message,omitempty"`
+}
