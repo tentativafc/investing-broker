@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -35,7 +36,7 @@ func GetUserIdFromToken(accessToken string) (string, error) {
 		}
 
 		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-		return ACCESS_SECRET, nil
+		return []byte(ACCESS_SECRET), nil
 	})
 
 	var userId string
@@ -43,4 +44,17 @@ func GetUserIdFromToken(accessToken string) (string, error) {
 		userId = claims["user_id"].(string)
 	}
 	return userId, err
+}
+
+func GetSubstringAfter(value string, a string) string {
+	// Get substring after a string.
+	pos := strings.LastIndex(value, a)
+	if pos == -1 {
+		return ""
+	}
+	adjustedPos := pos + len(a)
+	if adjustedPos >= len(value) {
+		return ""
+	}
+	return value[adjustedPos:]
 }

@@ -5,6 +5,8 @@ import (
 
 	"github.com/google/uuid"
 
+	"strings"
+
 	"github.com/tentativafc/investing-broker/user-rest/dto"
 	errorUR "github.com/tentativafc/investing-broker/user-rest/error"
 	"github.com/tentativafc/investing-broker/user-rest/repo"
@@ -55,7 +57,13 @@ func (us UserService) RecoverLogin(recover dto.RecoverLoginData) (dto.RecoverLog
 	return rl, err
 }
 
-func (us UserService) GetuserById(token string, userId string) (u dto.UserResponse, err error) {
+func (us UserService) GetuserById(authorization string, userId string) (u dto.UserResponse, err error) {
+
+	if strings.HasPrefix(authorization, "Bearer ") {
+		err = errorUR.NewAuthError("Token not found")
+	}
+
+	token := util.GetSubstringAfter(authorization, "Bearer ")
 
 	userIdJwt, err := util.GetUserIdFromToken(token)
 
