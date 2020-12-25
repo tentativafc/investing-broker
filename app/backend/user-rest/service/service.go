@@ -33,6 +33,36 @@ func (us UserService) CreateUser(u dto.User) (dto.User, error) {
 	return u, nil
 }
 
+func (us UserService) UpdateUser(u dto.UserUpdate, authorization string) (dto.UserUpdate, error) {
+
+	if !strings.HasPrefix(authorization, "Bearer ") {
+		err := errorUR.NewAuthError("Token not found")
+		return dto.UserUpdate{}, err
+	}
+
+	token := util.GetSubstringAfter(authorization, "Bearer ")
+
+	userIdJwt, err := util.GetUserIdFromToken(token)
+
+	if err != nil {
+		err = errorUR.NewAuthError("Token expired or invalid")
+		return dto.UserUpdate{}, err
+	}
+
+	if u.ID != userIdJwt {
+		err = errorUR.NewAuthError("Invalid credentials")
+		return dto.UserUpdate{}, err
+	}
+
+	userDb := repo.UserDB{ID: u.ID, Firstname: u.Firstname, Lastname: u.Lastname, Email: u.Email, UpdatedAt: time.Now()}
+	_, err = us.ur.UpdateUser(userDb)
+	if err != nil {
+		return dto.UserUpdate{}, errorUR.NewGenericError(err.Error())
+
+	}
+	return u, nil
+}
+
 func (us UserService) Login(login dto.LoginData) (dto.LoginResponse, error) {
 	var lr dto.LoginResponse
 	userDb, err := us.ur.FindByEmail(login.Email)
@@ -67,7 +97,7 @@ func (us UserService) RecoverLogin(recover dto.RecoverLoginData) (dto.RecoverLog
 
 func (us UserService) GetuserById(authorization string, userId string) (dto.UserResponse, error) {
 
-	if strings.HasPrefix(authorization, "Bearer ") {
+	if !strings.HasPrefix(authorization, "Bearer ") {
 		err := errorUR.NewAuthError("Token not found")
 		return dto.UserResponse{}, err
 	}

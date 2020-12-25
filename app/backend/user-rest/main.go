@@ -32,6 +32,21 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func UpdateUser(w http.ResponseWriter, r *http.Request) {
+	var u dto.UserUpdate
+	_ = json.NewDecoder(r.Body).Decode(&u)
+	params := mux.Vars(r)
+	var uId = params["id"]
+	authorization := r.Header.Get("Authorization")
+	u.ID = uId
+	u, err := us.UpdateUser(u, authorization)
+	if err != nil {
+		HandleError(err, w)
+	} else {
+		json.NewEncoder(w).Encode(&u)
+	}
+}
+
 func Login(w http.ResponseWriter, r *http.Request) {
 	var l dto.LoginData
 	_ = json.NewDecoder(r.Body).Decode(&l)
@@ -45,7 +60,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func RecoverLogin(w http.ResponseWriter, r *http.Request) {
-
 	var recoverLoginData dto.RecoverLoginData
 	_ = json.NewDecoder(r.Body).Decode(&recoverLoginData)
 
@@ -80,13 +94,13 @@ func HandleError(err error, w http.ResponseWriter) {
 		w.WriteHeader(500)
 	}
 	json.NewEncoder(w).Encode(dto.ErrorResponse{Msg: err.Error()})
-
 }
 
 func HandleRequests() {
 	router := mux.NewRouter()
 	router.HandleFunc("/", Home).Methods("GET")
 	router.HandleFunc("/users", CreateUser).Methods("POST")
+	router.HandleFunc("/users/{id}", UpdateUser).Methods("PUT")
 	router.HandleFunc("/users/login", Login).Methods("POST")
 	router.HandleFunc("/users/recover", RecoverLogin).Methods("POST")
 	router.HandleFunc("/users/{id}", GetUserById).Methods("GET")

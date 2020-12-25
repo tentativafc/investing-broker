@@ -47,6 +47,14 @@ func (ur UserRepository) CreateUser(u UserDB) (UserDB, error) {
 	return u, nil
 }
 
+func (ur UserRepository) UpdateUser(u UserDB) (UserDB, error) {
+	err := ur.db.Updates(&u).Error
+	if err != nil {
+		return UserDB{}, err
+	}
+	return u, nil
+}
+
 func (ur UserRepository) FindByEmail(email string) (UserDB, error) {
 	var userDb UserDB
 	ur.db.Where("email = ?", email).First(&userDb)
