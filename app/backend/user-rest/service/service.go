@@ -67,7 +67,7 @@ func (us UserService) Login(login dto.LoginData) (dto.LoginResponse, error) {
 	var lr dto.LoginResponse
 	userDb, err := us.ur.FindByEmail(login.Email)
 	if err != nil {
-		return lr, errorUR.NewNotFountError("User not found")
+		return lr, errorUR.NewNotFoundError("User not found")
 	}
 
 	authToken, err := util.CreateToken(userDb.ID)
@@ -82,7 +82,7 @@ func (us UserService) RecoverLogin(recover dto.RecoverLoginData) (dto.RecoverLog
 	var rl dto.RecoverLoginDataResponse
 	userDb, err := us.ur.FindByEmail(recover.Email)
 	if err != nil {
-		return rl, errorUR.NewNotFountError("User not found")
+		return rl, errorUR.NewNotFoundError("User not found")
 	}
 
 	tempPassword := uuid.New().String()
@@ -119,7 +119,7 @@ func (us UserService) GetuserById(authorization string, userId string) (dto.User
 
 	userDb, err := us.ur.FindById(userId)
 	if err != nil {
-		err = errorUR.NewNotFountError("User not found")
+		err = errorUR.NewNotFoundError("User not found")
 		return dto.UserResponse{}, err
 
 	}

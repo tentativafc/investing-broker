@@ -1,10 +1,13 @@
 package error
 
+import "net/http"
+
 type GenericError struct {
 	msg string // description of error
 }
 
 func (e *GenericError) Error() string { return e.msg }
+func (e *GenericError) Code() int     { return http.StatusInternalServerError }
 
 func NewGenericError(msg string) error {
 	return &GenericError{msg}
@@ -15,8 +18,9 @@ type NotFoundError struct {
 }
 
 func (e *NotFoundError) Error() string { return e.msg }
+func (e *NotFoundError) Code() int     { return http.StatusNotFound }
 
-func NewNotFountError(msg string) error {
+func NewNotFoundError(msg string) error {
 	return &NotFoundError{GenericError{msg: msg}}
 }
 
@@ -25,6 +29,7 @@ type AuthError struct {
 }
 
 func (e *AuthError) Error() string { return e.msg }
+func (e *AuthError) Code() int     { return http.StatusUnauthorized }
 
 func NewAuthError(msg string) error {
 	return &AuthError{GenericError{msg: msg}}
