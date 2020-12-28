@@ -18,7 +18,7 @@ var us service.UserService = service.NewUserService(ur)
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	var u dto.User
-	_ = json.NewDecoder(r.Body).Decode(&u)
+	json.NewDecoder(r.Body).Decode(&u)
 	ur, err := us.CreateUser(u)
 	if err != nil {
 		HandleError(err, w)
@@ -29,7 +29,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	var u dto.UserUpdate
-	_ = json.NewDecoder(r.Body).Decode(&u)
+	json.NewDecoder(r.Body).Decode(&u)
 	params := mux.Vars(r)
 	var uId = params["id"]
 	authorization := r.Header.Get("Authorization")
@@ -101,12 +101,13 @@ func NewError(w http.ResponseWriter, er dto.ErrorResponse) {
 }
 
 func HandleRequests() {
+
 	router := mux.NewRouter()
+	router.HandleFunc("/users/login", Login).Methods("POST")
+	router.HandleFunc("/users/{id}", GetUserById).Methods("GET")
+	router.HandleFunc("/users/recover", RecoverLogin).Methods("POST")
 	router.HandleFunc("/users", CreateUser).Methods("POST")
 	router.HandleFunc("/users/{id}", UpdateUser).Methods("PUT")
-	router.HandleFunc("/users/login", Login).Methods("POST")
-	router.HandleFunc("/users/recover", RecoverLogin).Methods("POST")
-	router.HandleFunc("/users/{id}", GetUserById).Methods("GET")
 
 	handler := cors.AllowAll().Handler(router)
 
