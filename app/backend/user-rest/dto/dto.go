@@ -20,6 +20,7 @@ type UserResponse struct {
 	Firstname string `json:"firstname,omitempty"`
 	Lastname  string `json:"lastname,omitempty"`
 	Email     string `json:"email,omitempty"`
+	Token     string `json:"auth_token,omitempty"`
 }
 
 type LoginData struct {
@@ -29,11 +30,6 @@ type LoginData struct {
 
 type RecoverLoginData struct {
 	Email string `json:"email,omitempty"`
-}
-
-type LoginResponse struct {
-	Token    string       `json:"auth_token,omitempty"`
-	UserData UserResponse `json:"user,omitempty"`
 }
 
 type RecoverLoginDataResponse struct {

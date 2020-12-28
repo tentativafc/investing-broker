@@ -22,15 +22,21 @@ func NewUserService(ur repo.UserRepository) UserService {
 	return us
 }
 
-func (us UserService) CreateUser(u dto.User) (dto.User, error) {
+func (us UserService) CreateUser(u dto.User) (dto.UserResponse, error) {
 	u.ID = uuid.New().String()
 	userDb := repo.UserDB{ID: u.ID, Firstname: u.Firstname, Lastname: u.Lastname, Email: u.Email, Password: u.Password, CreatedAt: time.Now()}
 	_, err := us.ur.CreateUser(userDb)
+	var ur dto.UserResponse
 	if err != nil {
-		return dto.User{}, errorUR.NewGenericError(err.Error())
+		return ur, errorUR.NewGenericError(err.Error())
 
 	}
-	return u, nil
+	authToken, err := util.CreateToken(userDb.ID)
+	if err != nil {
+		return ur, errorUR.NewAuthError("Error to generating jwt")
+	}
+	ur = dto.UserResponse{Token: authToken, ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email}
+	return ur, nil
 }
 
 func (us UserService) UpdateUser(u dto.UserUpdate, authorization string) (dto.UserUpdate, error) {
@@ -63,19 +69,18 @@ func (us UserService) UpdateUser(u dto.UserUpdate, authorization string) (dto.Us
 	return u, nil
 }
 
-func (us UserService) Login(login dto.LoginData) (dto.LoginResponse, error) {
-	var lr dto.LoginResponse
+func (us UserService) Login(login dto.LoginData) (dto.UserResponse, error) {
+	var ur dto.UserResponse
 	userDb, err := us.ur.FindByEmail(login.Email)
 	if err != nil {
-		return lr, errorUR.NewNotFoundError("User not found")
+		return ur, errorUR.NewNotFoundError("User not found")
 	}
-
 	authToken, err := util.CreateToken(userDb.ID)
 	if err != nil {
-		return lr, errorUR.NewAuthError("Error to generating jwt")
+		return ur, errorUR.NewAuthError("Error to generating jwt")
 	}
-	lr = dto.LoginResponse{Token: authToken, UserData: dto.UserResponse{ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email}}
-	return lr, nil
+	ur = dto.UserResponse{Token: authToken, ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email}
+	return ur, nil
 }
 
 func (us UserService) RecoverLogin(recover dto.RecoverLoginData) (dto.RecoverLoginDataResponse, error) {

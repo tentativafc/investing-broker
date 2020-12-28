@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -17,18 +16,14 @@ import (
 var ur repo.UserRepository = repo.NewUserRepository()
 var us service.UserService = service.NewUserService(ur)
 
-func Home(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Home")
-}
-
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	var u dto.User
 	_ = json.NewDecoder(r.Body).Decode(&u)
-	u, err := us.CreateUser(u)
+	ur, err := us.CreateUser(u)
 	if err != nil {
 		HandleError(err, w)
 	} else {
-		json.NewEncoder(w).Encode(&u)
+		json.NewEncoder(w).Encode(&ur)
 	}
 }
 
@@ -50,12 +45,11 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 func Login(w http.ResponseWriter, r *http.Request) {
 	var l dto.LoginData
 	_ = json.NewDecoder(r.Body).Decode(&l)
-
-	lr, err := us.Login(l)
+	ur, err := us.Login(l)
 	if err != nil {
 		HandleError(err, w)
 	} else {
-		json.NewEncoder(w).Encode(&lr)
+		json.NewEncoder(w).Encode(&ur)
 	}
 }
 
@@ -90,7 +84,7 @@ func HandleError(err error, w http.ResponseWriter) {
 	case *errorUR.NotFoundError:
 		code = err.(*errorUR.NotFoundError).Code()
 	case *errorUR.AuthError:
-		code = err.(*errorUR.NotFoundError).Code()
+		code = err.(*errorUR.AuthError).Code()
 	default:
 		code = http.StatusInternalServerError
 	}
@@ -100,15 +94,14 @@ func HandleError(err error, w http.ResponseWriter) {
 }
 
 func NewError(w http.ResponseWriter, er dto.ErrorResponse) {
+	w.WriteHeader(er.Code)
 	json.NewEncoder(w).Encode(er)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
-	w.WriteHeader(er.Code)
 }
 
 func HandleRequests() {
 	router := mux.NewRouter()
-	router.HandleFunc("/", Home).Methods("GET")
 	router.HandleFunc("/users", CreateUser).Methods("POST")
 	router.HandleFunc("/users/{id}", UpdateUser).Methods("PUT")
 	router.HandleFunc("/users/login", Login).Methods("POST")
