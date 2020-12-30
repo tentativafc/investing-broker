@@ -1,4 +1,6 @@
-# Investiment Broker
+# Investing Broker
+
+Provides a complete tool to control personal investments.
 
 ## Frontend
 
