@@ -1,3 +1,3 @@
 export default errorValue => {
-    return `${errorValue[0]}`;
-};
+  return `${errorValue[0]}`
+}

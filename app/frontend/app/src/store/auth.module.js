@@ -10,7 +10,12 @@ import {
   UPDATE_USER,
   FORGET_PASSWORD
 } from './actions.type'
-import { SET_AUTH, PURGE_AUTH, SET_ERROR } from './mutations.type'
+import {
+  SET_AUTH,
+  PURGE_AUTH,
+  SET_ERROR,
+  SET_GENERIC_ERROR
+} from './mutations.type'
 
 const initialState = {
   errors: [],
@@ -27,14 +32,19 @@ const getters = {
 
 const actions = {
   [LOGIN]({ commit }, credentials) {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       ApiService.post('users/login', { ...credentials })
         .then(({ data }) => {
           commit(SET_AUTH, data)
           resolve(data)
         })
         .catch(({ response }) => {
-          commit(SET_ERROR, response.data.errors)
+          let error = null
+          if (response && response.data) {
+            error = response.data
+          }
+          commit(SET_GENERIC_ERROR, error)
+          reject(error)
         })
     })
   },
@@ -49,8 +59,12 @@ const actions = {
           resolve(data)
         })
         .catch(({ response }) => {
-          commit(SET_ERROR, response.data.errors)
-          reject(response)
+          let error = null
+          if (response && response.data) {
+            error = response.data
+          }
+          commit(SET_GENERIC_ERROR, error)
+          reject(error)
         })
     })
   },
@@ -61,8 +75,12 @@ const actions = {
           resolve(data)
         })
         .catch(({ response }) => {
-          commit(SET_ERROR, response.data)
-          reject(response)
+          let error = null
+          if (response && response.data) {
+            error = response.data
+          }
+          commit(SET_GENERIC_ERROR, error)
+          reject(error)
         })
     })
   },
@@ -74,7 +92,11 @@ const actions = {
           commit(SET_AUTH, data)
         })
         .catch(({ response }) => {
-          commit(SET_ERROR, response.data.errors)
+          let error = null
+          if (response && response.data) {
+            error = response.data
+          }
+          commit(SET_BACKEND_ERROR, error)
         })
     } else {
       commit(PURGE_AUTH)
@@ -101,19 +123,22 @@ const actions = {
 
 const mutations = {
   [SET_ERROR](state, error) {
-    state.errors = error
+    if (!error) {
+      error = { code: 500, message: 'Sistema indisponível' }
+    }
+    state.errors = [...state.errors, error]
   },
   [SET_AUTH](state, loginData) {
     state.isAuthenticated = true
     state.user = { ...loginData }
-    state.errors = {}
+    state.errors = []
     LoginService.saveToken(loginData.auth_token)
     LoginService.saveUser(state.user)
   },
   [PURGE_AUTH](state) {
     state.isAuthenticated = false
     state.user = {}
-    state.errors = {}
+    state.errors = []
     LoginService.destroy()
     router.go('/')
   }

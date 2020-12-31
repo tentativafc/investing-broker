@@ -11,7 +11,7 @@
 
 import { mapState } from 'vuex'
 export default {
-  name: 'Error',
+  name: 'ValidationError',
   computed: {
     ...mapState({
       errors: state => state.auth.errors

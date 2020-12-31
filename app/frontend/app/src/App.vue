@@ -1,10 +1,14 @@
 <template>
-  <router-view></router-view>
+  <div>
+    <GenericError />
+    <router-view></router-view>
+  </div>
 </template>
 
 <script>
-// import Error from '@/components/Error'
+import GenericError from '@/components/GenericError'
 export default {
-  name: 'App'
+  name: 'App',
+  components: { GenericError }
 }
 </script>

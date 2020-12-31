@@ -11,6 +11,7 @@ const ApiService = {
   },
 
   setHeader() {
+    console.log(LoginService.getToken())
     Vue.axios.defaults.headers.common[
       'Authorization'
     ] = `Bearer ${LoginService.getToken()}`
