@@ -40,6 +40,11 @@ func GetUserIdFromToken(accessToken string) (string, error) {
 	})
 
 	var userId string
+
+	if err != nil {
+		return userId, err
+	}
+
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		userId = claims["user_id"].(string)
 	}
