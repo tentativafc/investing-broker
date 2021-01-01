@@ -26,10 +26,7 @@ const ApiService = {
   },
 
   post(resource, params) {
-    return Vue.axios.post(`${resource}`, params).catch(error => {
-      console.log('Erro animal')
-      throw new Error(`[RWV] ApiService ${error}`)
-    })
+    return Vue.axios.post(`${resource}`, params)
   },
 
   update(resource, slug, params) {

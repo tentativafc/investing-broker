@@ -25,8 +25,8 @@
                       Preencha seu email e senha para acesso ao aplicativo.
                     </p>
 
-                    <Error />
-                    <!-- Error Component -->
+                    <ValidationError />
+                    <!-- ValidationError Component -->
 
                     <form
                       class="user"
@@ -105,13 +105,13 @@
 <script>
 import { mapMutations } from 'vuex'
 import { LOGIN } from '@/store/actions.type'
-import { SET_ERROR } from '@/store/mutations.type'
+import { SET_VALIDATION_ERROR } from '@/store/mutations.type'
 import { validEmail } from '@/common/functions'
-import Error from "./Error.vue"
+import ValidationError from "./ValidationError.vue"
 
 export default {
   name: "LoginComponent",
-  components: {Error},
+  components: {ValidationError},
   data() {
     return {
       email: null,
@@ -121,7 +121,6 @@ export default {
   methods: {
     validateAndSubmit: function(e) {
       e.preventDefault()
-
       let errors = []
       if (!this.email) {
         errors.push('O e-mail é obrigatório.')
@@ -132,7 +131,7 @@ export default {
         errors.push('A senha é obrigatória.')
       }
       if (errors.length) {
-        this.[SET_ERROR](errors)
+        this.[SET_VALIDATION_ERROR](errors)
       } else {
         this.$store
           .dispatch(LOGIN, { email: this.email, password: this.password })
@@ -140,7 +139,7 @@ export default {
       }
       return false;
     },
-    ...mapMutations([SET_ERROR]),
+    ...mapMutations([SET_VALIDATION_ERROR]),
   }
 }
 </script>

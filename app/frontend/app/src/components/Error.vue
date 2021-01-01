@@ -1,22 +1,38 @@
 <template>
-    <p v-if="errors.length">
-        <b>Ocorreram os seguintes erros:</b>
-        <ul>
-        <li v-for="(error, index) in errors" :key="index" class="text-danger"> {{ error }}</li>
-        </ul>
-    </p>
+  <UiSnackbarContainer ref="snackbar" :duration="6000" />
+
+  <!-- <p v-if="errors.length">
+      <b>Ops!</b>
+      <ul>
+        <li v-for="(error, index) in errors" :key="index" class="text-danger"> {{ error.message }}</li>
+      </ul>
+  </p> -->
 </template>
 
 <script>
-
-import { mapState } from 'vuex'
+import { UiSnackbarContainer } from 'keen-ui'
+import { mapActions, mapState } from 'vuex'
 export default {
-  name: 'ValidationError',
+  name: 'Error',
+  components: { UiSnackbarContainer },
+  methods: {
+    ...mapActions
+  },
   computed: {
     ...mapState({
-      errors: state => state.auth.errors
+      errors: state => state.common.errors,
+      errors_messages: state => state.common.errors_messages
     })
+  },
+  watch: {
+    errors(errors) {
+      console.log('Watch')
+      if (errors) {
+        this.$refs.snackbar.createSnackbar({
+          message: this.errors_messages
+        })
+      }
+    }
   }
 }
-
 </script>

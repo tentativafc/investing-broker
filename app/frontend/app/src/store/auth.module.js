@@ -10,12 +10,7 @@ import {
   UPDATE_USER,
   FORGET_PASSWORD
 } from './actions.type'
-import {
-  SET_AUTH,
-  PURGE_AUTH,
-  SET_ERROR,
-  SET_GENERIC_ERROR
-} from './mutations.type'
+import { SET_AUTH, PURGE_AUTH, SET_ERROR } from './mutations.type'
 
 const initialState = {
   errors: [],
@@ -39,11 +34,12 @@ const actions = {
           resolve(data)
         })
         .catch(({ response }) => {
-          let error = null
+          let error = ''
           if (response && response.data) {
             error = response.data
           }
-          commit(SET_GENERIC_ERROR, error)
+
+          commit(SET_ERROR, error)
           reject(error)
         })
     })
@@ -63,7 +59,7 @@ const actions = {
           if (response && response.data) {
             error = response.data
           }
-          commit(SET_GENERIC_ERROR, error)
+          commit(SET_ERROR, error)
           reject(error)
         })
     })
@@ -79,7 +75,7 @@ const actions = {
           if (response && response.data) {
             error = response.data
           }
-          commit(SET_GENERIC_ERROR, error)
+          commit(SET_ERROR, error)
           reject(error)
         })
     })
@@ -96,7 +92,7 @@ const actions = {
           if (response && response.data) {
             error = response.data
           }
-          commit(SET_BACKEND_ERROR, error)
+          commit(SET_ERROR, error)
         })
     } else {
       commit(PURGE_AUTH)
@@ -122,12 +118,6 @@ const actions = {
 }
 
 const mutations = {
-  [SET_ERROR](state, error) {
-    if (!error) {
-      error = { code: 500, message: 'Sistema indisponível' }
-    }
-    state.errors = [...state.errors, error]
-  },
   [SET_AUTH](state, loginData) {
     state.isAuthenticated = true
     state.user = { ...loginData }

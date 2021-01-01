@@ -1,14 +1,27 @@
 <template>
   <div>
-    <GenericError />
-    <router-view></router-view>
+    <router-view></router-view>    
+    <Error />
+    <!-- Error Component -->
   </div>
 </template>
 
 <script>
-import GenericError from '@/components/GenericError'
+import Error from "./components/Error.vue"
 export default {
   name: 'App',
-  components: { GenericError }
+  components: {Error},
+
 }
 </script>
+
+<style>
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 100%;
+}
