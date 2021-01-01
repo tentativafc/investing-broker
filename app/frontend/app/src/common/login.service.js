@@ -2,7 +2,6 @@ const ID_TOKEN_KEY = 'auth_token'
 const USER_DATA = 'user_data'
 
 export const getToken = () => {
-  console.log('Testando')
   return window.localStorage.getItem(ID_TOKEN_KEY)
 }
 

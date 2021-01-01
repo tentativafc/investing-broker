@@ -81,9 +81,9 @@ func NewUserRepository() UserRepository {
 }
 
 func DbInit() *gorm.DB {
-	db_configs := "host=localhost user=postgres password=123456 dbname=postgres port=5432"
+	dbConfigs := "host=localhost user=postgres password=123456 dbname=postgres port=5432"
 	var err error
-	db, err := gorm.Open(postgres.Open(db_configs), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dbConfigs), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}

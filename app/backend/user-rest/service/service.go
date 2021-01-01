@@ -126,7 +126,6 @@ func (us UserService) GetuserById(authorization string, userId string) (dto.User
 	if err != nil {
 		err = errorUR.NewNotFoundError("User not found")
 		return dto.UserResponse{}, err
-
 	}
 	return dto.UserResponse{ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email, Token: token}, nil
 }
