@@ -3,8 +3,9 @@
 .idea/*
 /logs/**
 /analytics/data/**/COTAHIST*
-docker/**
+app/backend/docker/**
 /**/Bolsa.egg-info
 /analytics/ortisan-ta/ortisan_ta.egg-info/**
 /analytics/docker/**
-app/frontend/node_modules/
+
+.vscode/

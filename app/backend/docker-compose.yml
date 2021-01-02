@@ -12,3 +12,16 @@ services:
       - ./db-init-scripts:/docker-entrypoint-initdb.d
     ports:
       - '5432:5432'
+
+  mongo_ibovespa_assets:
+    image: mongo:4.4.2
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongo
+      - MONGO_INITDB_ROOT_PASSWORD=123456
+      - MONGO_INITDB_DATABASE=ibovespa_assets
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./docker/mongo-data/prod:/data/db
+      - ./db-init-scripts/mongo-init.js/:/docker-entrypoint-initdb.d/mongo-init.js:ro
