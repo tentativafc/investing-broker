@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const url = "mongodb://mongo:123456@localhost:27017";
+const url = "mongodb://mongouser:mongopass@localhost:27017/ibovespa_assets";
 
 mongoose.connect(url);
 
