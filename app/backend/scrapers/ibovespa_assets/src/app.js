@@ -63,7 +63,8 @@ const get = async function (req, res, next) {
 const post = async function (req, res, next) {
   try {
     let scraper = new Scraper();
-    res.json(scraper.load());
+
+    res.json(await scraper.load());
   } catch (error) {
     console.error(error);
     res.send(500);

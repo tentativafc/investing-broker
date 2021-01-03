@@ -14,7 +14,7 @@ const AssetSchema = new mongoose.Schema({
 
 const IbovespaAssetsSchema = new mongoose.Schema(
   {
-    title: { type: String, required: true },
+    title: { type: String, required: true, unique: true },
     assets: [AssetSchema],
   },
   { collection: "ibovespa_assets", autoIndex: false }
