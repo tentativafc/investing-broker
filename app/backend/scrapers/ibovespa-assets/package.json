@@ -1,7 +1,7 @@
 {
-  "name": "scrapers",
+  "name": "ibovespa-assets",
   "version": "1.0.0",
-  "description": "Scrapers",
+  "description": "Scraper of Ibovespa Assets",
   "main": "index.js",
   "scripts": {
     "start": "node app.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "tentativafc/investing-broker/app/backend/scrapers"
+    "url": "tentativafc/investing-broker/app/backend/scrapers/ibovespa-assets"
   },
   "keywords": [
     "scraper"
