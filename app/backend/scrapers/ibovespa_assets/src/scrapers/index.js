@@ -1,6 +1,6 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
-var models = require("../models/models");
+var models = require("../models/index");
 
 const url =
   "http://bvmf.bmfbovespa.com.br/indices/ResumoCarteiraTeorica.aspx?Indice=IBOV&idioma=pt-br";
