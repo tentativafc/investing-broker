@@ -5,9 +5,9 @@ const moment = require("moment");
 
 const CurrencyEnum = {
   dolar: 61,
-  // euro: 222,
-  // iene: 101,
-  // iuan: 178,
+  euro: 222,
+  iene: 101,
+  iuan: 178,
 };
 
 const fetchData = async (url) => {
