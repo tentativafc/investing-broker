@@ -25,23 +25,30 @@
                       Preencha seu email e senha para acesso ao aplicativo.
                     </p>
 
-                    <ValidationError />
-                    <!-- ValidationError Component -->
-
                     <form
                       class="user"
                       id="app"
                       @submit="validateAndSubmit"
-                      novalidate="true"
+                      novalidate
                     >
-                      <div class="form-group">
+                      <div
+                        class="form-group"
+                        :class="{ 'form-group-error': $v.email.$error }"
+                      >
                         <input
                           type="email"
                           class="form-control form-control-user"
                           id="exampleInputEmail"
                           placeholder="Email"
                           v-model="email"
+                          required
                         />
+                        <div class="invalid-feedback" v-if="!$v.email.required">
+                          Campo obrigatório
+                        </div>
+                        <div class="invalid-feedback" v-if="!$v.email.email">
+                          Email inválido
+                        </div>
                       </div>
                       <div class="form-group">
                         <input
@@ -107,11 +114,10 @@ import { mapMutations } from 'vuex'
 import { LOGIN } from '@/store/actions.type'
 import { SET_VALIDATION_ERROR } from '@/store/mutations.type'
 import { validEmail } from '@/common/functions'
-import ValidationError from "./ValidationError.vue"
+import { required, email, between } from 'vuelidate/lib/validators'
 
 export default {
   name: "LoginComponent",
-  components: {ValidationError},
   data() {
     return {
       email: null,
@@ -140,6 +146,16 @@ export default {
       return false;
     },
     ...mapMutations([SET_VALIDATION_ERROR]),
+  },
+
+  validations: {
+    email: {
+      required,
+      email
+    },
+    password: {
+      between: between(6, 20)
+    }
   }
 }
 </script>
