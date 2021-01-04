@@ -1,0 +1,25 @@
+{
+  "name": "selic",
+  "version": "1.0.0",
+  "description": "Scraper of selic index",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "start-dev": "nodemon src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "tentativafc/investing-broker/app/backend/scrapers/selic"
+  },
+  "keywords": [
+    "scraper"
+  ],
+  "author": "Marcelo Ortiz de Santana",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "moment": "^2.29.1",
+    "mongoose": "^5.11.9",
+    "restify": "^8.5.1"
+  }
+}

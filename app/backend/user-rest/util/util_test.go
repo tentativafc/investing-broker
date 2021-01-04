@@ -22,7 +22,6 @@ func TestCreateAndDecodeToken(t *testing.T) {
 		t.Errorf("Expected %v but got %v", userId, userIdDecoded)
 
 	}
-
 }
 
 func TestDecodeInvalidToken(t *testing.T) {

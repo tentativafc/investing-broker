@@ -39,3 +39,16 @@ services:
       - ./docker/mongo-data-currency:/data/db
       - ./db-init-scripts/mongo-init-currency.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
+  mongo_selic:
+    image: mongo:4.4.2
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongo
+      - MONGO_INITDB_ROOT_PASSWORD=123456
+      - MONGO_INITDB_DATABASE=selic
+    ports:
+      - '27019:27017'
+    volumes:
+      - ./docker/mongo-data-selic:/data/db
+      - ./db-init-scripts/mongo-init-selic.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
