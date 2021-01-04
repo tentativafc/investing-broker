@@ -69,9 +69,15 @@ func (us UserService) UpdateUser(u dto.UserUpdate, authorization string) (dto.Us
 	return u, nil
 }
 
-func (us UserService) Login(login dto.LoginData) (dto.UserResponse, error) {
+func (us UserService) Login(l dto.LoginData) (dto.UserResponse, error) {
+
 	var ur dto.UserResponse
-	userDb, err := us.ur.FindByEmail(login.Email)
+	err := l.Validate()
+	if err != nil {
+		return ur, err
+	}
+
+	userDb, err := us.ur.FindByEmail(l.Email)
 	if err != nil {
 		return ur, errorUR.NewNotFoundError("User not found")
 	}
