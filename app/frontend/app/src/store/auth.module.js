@@ -1,5 +1,5 @@
 import ApiService from '@/common/api.service'
-import LoginService from '@/common/login.service'
+import StorageService from '@/common/storage.service'
 import router from '../router'
 
 import {
@@ -14,8 +14,8 @@ import { SET_AUTH, PURGE_AUTH, SET_ERROR } from './mutations.type'
 
 const initialState = {
   errors: [],
-  user: { ...LoginService.getUser() },
-  isAuthenticated: !!LoginService.getToken()
+  user: { ...StorageService.getUser() },
+  isAuthenticated: !!StorageService.getToken()
 }
 
 const state = { ...initialState }
@@ -122,14 +122,14 @@ const mutations = {
     state.isAuthenticated = true
     state.user = { ...loginData }
     state.errors = []
-    LoginService.saveToken(loginData.auth_token)
-    LoginService.saveUser(state.user)
+    StorageService.saveToken(loginData.auth_token)
+    StorageService.saveUser(state.user)
   },
   [PURGE_AUTH](state) {
     state.isAuthenticated = false
     state.user = {}
     state.errors = []
-    LoginService.destroy()
+    StorageService.destroy()
     router.go('/')
   }
 }

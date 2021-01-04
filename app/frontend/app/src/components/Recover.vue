@@ -20,46 +20,52 @@
                         />
                       </a>
                     </div>
-                    <h1 class="h5 mb-1">Reset Password</h1>
+                    <h1 class="h5 mb-1">Trocar Senha</h1>
                     <p class="text-muted mb-4">
-                      Enter your email address and we'll send you an email with
-                      instructions to reset your password.
+                      Digite seu email e enviaremos um email com as instruções
+                      para a renovação.
                     </p>
 
                     <div class="form-group">
-                      <label for="exampleInputEmail">Email Address</label>
                       <input
                         type="email"
-                        class="form-control form-control-user"
-                        id="exampleInputEmail"
-                        placeholder="Email Address"
+                        class="form-control"
+                        :class="{ 'is-invalid': $v.email.$error }"
+                        id="email"
+                        placeholder="Email"
                         v-model="email"
                       />
+                      <div class="invalid-feedback" v-if="!$v.email.required">
+                        Campo obrigatório
+                      </div>
+                      <div class="invalid-feedback" v-if="!$v.email.email">
+                        Email inválido
+                      </div>
                     </div>
-                    <a
-                      href=""
+                    <button
+                      type="submit"
                       class="btn btn-success btn-block"
-                      v-on:click="validateAndSubmit"
+                      v-on:click="submit"
                     >
-                      Log In
-                    </a>
+                      Recuperar senha
+                    </button>
 
                     <div class="row mt-5">
                       <div class="col-12 text-center">
                         <p class="text-muted">
-                          Already have account?
+                          Já possui conta?
                           <a
                             href="/login"
                             class="text-muted font-weight-medium ml-1"
-                            ><b>Sign In</b></a
+                            ><b>Login</b></a
                           >
                         </p>
                         <p class="text-muted mb-0">
-                          Don't have an account?
+                          Não possui conta?
                           <a
                             href="/register"
                             class="text-muted font-weight-medium ml-1"
-                            ><b>Sign Up</b></a
+                            ><b>Registre-se</b></a
                           >
                         </p>
                       </div>
@@ -86,7 +92,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { required, email } from 'vuelidate/lib/validators'
+
 import { FORGET_PASSWORD } from '@/store/actions.type'
 export default {
   data() {
@@ -94,18 +101,22 @@ export default {
       email: null
     }
   },
-  methods: {
-    validateAndSubmit: function(e) {
-      e.preventDefault()
-      this.$store
-        .dispatch(FORGET_PASSWORD, { email: this.email })
-        .then(() => this.$router.push({ name: 'login' }))
+  validations: {
+    email: {
+      required,
+      email
     }
   },
-  computed: {
-    ...mapState({
-      errors: state => state.auth.errors
-    })
+  methods: {
+    submit: function(e) {
+      e.preventDefault()
+      this.$v.$touch()
+      if (!this.$v.$invalid) {
+        this.$store
+          .dispatch(FORGET_PASSWORD, { email: this.email })
+          .then(() => this.$router.push({ name: 'login' }))
+      }
+    }
   }
 }
 </script>

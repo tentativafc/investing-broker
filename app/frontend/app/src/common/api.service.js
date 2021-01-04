@@ -1,7 +1,7 @@
 import axios from 'axios'
 import Vue from 'vue'
 import VueAxios from 'vue-axios'
-import LoginService from '@/common/login.service'
+import StorageService from '@/common/storage.service'
 import { API_URL } from '@/common/config'
 
 const ApiService = {
@@ -11,10 +11,10 @@ const ApiService = {
   },
 
   setHeader() {
-    console.log(LoginService.getToken())
+    console.log(StorageService.getToken())
     Vue.axios.defaults.headers.common[
       'Authorization'
-    ] = `Bearer ${LoginService.getToken()}`
+    ] = `Bearer ${StorageService.getToken()}`
   },
 
   query(resource, params) {

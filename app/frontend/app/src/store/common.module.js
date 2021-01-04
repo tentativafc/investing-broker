@@ -15,11 +15,13 @@ const actions = {}
 const mutations = {
   [SET_ERROR](state, error) {
     if (!error) {
-      error = { code: 500, message: 'Sistema indisponível' }
+      error = {
+        code: 500,
+        message: 'Sistema indisponível. Tente novamente mais tarde.'
+      }
     }
     state.errors = []
     state.errors = [...state.errors, error]
-    console.log('TEstando 123')
     state.errors_messages = state.errors.map(error_ => error_.message).join(',')
   },
   [SET_VALIDATION_ERROR](state, error_message) {

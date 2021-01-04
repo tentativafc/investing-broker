@@ -1,6 +1,5 @@
 <template>
   <UiSnackbarContainer ref="snackbar" :duration="6000" />
-
   <!-- <p v-if="errors.length">
       <b>Ops!</b>
       <ul>
@@ -26,7 +25,6 @@ export default {
   },
   watch: {
     errors(errors) {
-      console.log('Watch')
       if (errors) {
         this.$refs.snackbar.createSnackbar({
           message: this.errors_messages
