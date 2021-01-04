@@ -25,71 +25,135 @@
                       Não possui uma conta? Crie uma, leva menos de 1 minuto.
                     </p>
 
-                    <Error />
-                    <!-- Error Component -->
-
-                    <form
-                      class="user"
-                      id="app"
-                      @submit="validateAndSubmit"
-                      novalidate="true"
-                    >
+                    <form class="user" id="app" @submit="submit" novalidate>
                       <div class="form-group row">
                         <div class="col-sm-6 mb-3 mb-sm-0">
                           <input
                             type="text"
-                            class="form-control form-control-user"
-                            id="firstName"
+                            class="form-control"
+                            :class="{ 'is-invalid': $v.firstname.$error }"
+                            id="firstname"
                             v-model="firstname"
                             placeholder="Primeiro nome"
+                            required
                           />
+                          <div
+                            class="invalid-feedback"
+                            v-if="!$v.firstname.required"
+                          >
+                            Campo obrigatório
+                          </div>
                         </div>
                         <div class="col-sm-6">
                           <input
                             type="text"
-                            class="form-control form-control-user"
-                            id="lastName"
+                            class="form-control"
+                            :class="{ 'is-invalid': $v.lastname.$error }"
+                            id="lastname"
                             v-model="lastname"
                             placeholder="Último nome"
+                            required
                           />
+                          <div
+                            class="invalid-feedback"
+                            v-if="!$v.lastname.required"
+                          >
+                            Campo obrigatório
+                          </div>
                         </div>
                       </div>
                       <div class="form-group">
                         <input
                           type="email"
-                          class="form-control form-control-user"
+                          class="form-control"
+                          :class="{ 'is-invalid': $v.email.$error }"
                           id="email"
                           v-model="email"
                           placeholder="Email"
+                          required
                         />
+                        <div class="invalid-feedback" v-if="!$v.email.required">
+                          Campo obrigatório
+                        </div>
+                        <div class="invalid-feedback" v-if="!$v.email.email">
+                          Email inválido
+                        </div>
                       </div>
                       <div class="form-group row">
                         <div class="col-sm-6 mb-3 mb-sm-0">
                           <input
                             type="password"
-                            class="form-control form-control-user"
+                            class="form-control"
+                            :class="{ 'is-invalid': $v.password.$error }"
                             v-model="password"
                             id="password"
                             placeholder="Senha"
+                            required
                           />
+                          <div
+                            class="invalid-feedback"
+                            v-if="!$v.password.required"
+                          >
+                            Campo obrigatório
+                          </div>
+                          <div
+                            class="invalid-feedback"
+                            v-if="!$v.password.minLength"
+                          >
+                            Campo precisa ter no mínimo
+                            {{ $v.password.$params.minLength.min }} caracteres.
+                          </div>
+                          <div
+                            class="invalid-feedback"
+                            v-if="!$v.password.maxLength"
+                          >
+                            Campo precisa ter no máximo
+                            {{ $v.password.$params.maxLength.max }} caracteres.
+                          </div>
                         </div>
                         <div class="col-sm-6">
                           <input
                             type="password"
-                            class="form-control form-control-user"
+                            class="form-control"
+                            :class="{ 'is-invalid': $v.repeat_password.$error }"
                             v-model="repeat_password"
-                            id="repeatPassword"
+                            id="repeat_password"
                             placeholder="Confirmação de senha"
+                            required
                           />
+                          <div
+                            class="invalid-feedback"
+                            v-if="!$v.repeat_password.required"
+                          >
+                            Campo obrigatório
+                          </div>
+                          <div
+                            class="invalid-feedback"
+                            v-if="!$v.repeat_password.minLength"
+                          >
+                            Campo precisa ter no mínimo
+                            {{ $v.repeat_password.$params.minLength.min }}
+                            caracteres.
+                          </div>
+                          <div
+                            class="invalid-feedback"
+                            v-if="!$v.repeat_password.maxLength"
+                          >
+                            Campo precisa ter no máximo
+                            {{ $v.repeat_password.$params.maxLength.max }}
+                            caracteres.
+                          </div>
+                          <div
+                            class="invalid-feedback"
+                            v-if="!$v.repeat_password.sameAs"
+                          >
+                            A senha e a confirmação de senha são diferentes.
+                          </div>
                         </div>
                       </div>
-                      <a
-                        href=""
-                        class="btn btn-success btn-block"
-                        v-on:click="validateAndSubmit"
-                      >
+                      <button type="submit" class="btn btn-success btn-block">
                         Criar conta
-                      </a>
+                      </button>
                     </form>
 
                     <div class="row mt-4">
@@ -126,15 +190,17 @@
   <!-- end page -->
 </template>
 <script>
-import { mapMutations } from 'vuex'
+import {
+  required,
+  email,
+  minLength,
+  maxLength,
+  sameAs
+} from 'vuelidate/lib/validators'
 import { REGISTER } from '@/store/actions.type'
-import { SET_ERROR } from '@/store/mutations.type'
-import { validEmail } from '@/common/functions'
-import Error from './Error.vue'
 
 export default {
   name: 'RegisterComponent',
-  components: { Error },
   data() {
     return {
       firstname: null,
@@ -144,45 +210,46 @@ export default {
       repeat_password: null
     }
   },
+  validations: {
+    firstname: {
+      required
+    },
+    lastname: {
+      required
+    },
+    email: {
+      required,
+      email
+    },
+    password: {
+      required,
+      minLength: minLength(6),
+      maxLength: maxLength(20)
+    },
+    repeat_password: {
+      required,
+      minLength: minLength(6),
+      maxLength: maxLength(20),
+      sameAsPassword: sameAs('password')
+    }
+  },
+
   methods: {
-    validateAndSubmit: function(e) {
+    submit: function(e) {
       e.preventDefault()
 
-      let errors = []
-      if (!this.firstname) {
-        errors.push('O primeiro nome é obrigatório.')
-      }
-      if (!this.lastname) {
-        errors.push('O último nome é obrigatório.')
-      }
-      if (!this.email) {
-        errors.push('O e-mail é obrigatório.')
-      } else if (!validEmail(this.email)) {
-        errors.push('Utilize um e-mail válido.')
-      }
-      if (!this.password) {
-        errors.push('A senha é obrigatória.')
-      }
-
-        if (!this.repeat_password) {
-                errors.push('A conformação de senha é obrigatória.')
-            }
-
-
-        if (this.password !== this.repeat_password) {
-                errors.push('A senha e conformação são diferentes.')
-        }
-
-      if (errors.length) {
-        this.[SET_ERROR](errors)
-      } else {
+      this.$v.$touch()
+      if (!this.$v.$invalid) {
         this.$store
-          .dispatch(REGISTER, { firstname: this.firstname, lastname:this.lastname, email: this.email, password: this.password })
+          .dispatch(REGISTER, {
+            firstname: this.firstname,
+            lastname: this.lastname,
+            email: this.email,
+            password: this.password
+          })
           .then(() => this.$router.push({ name: 'home' }))
       }
-      return false;
-    },
-    ...mapMutations([SET_ERROR]),
+    }
   }
 }
 </script>

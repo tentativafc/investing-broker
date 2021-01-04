@@ -25,19 +25,12 @@
                       Preencha seu email e senha para acesso ao aplicativo.
                     </p>
 
-                    <form
-                      class="user"
-                      id="app"
-                      @submit="validateAndSubmit"
-                      novalidate
-                    >
-                      <div
-                        class="form-group"
-                        :class="{ 'form-group-error': $v.email.$error }"
-                      >
+                    <form class="user" id="app" novalidate @submit="submit">
+                      <div class="form-group">
                         <input
                           type="email"
-                          class="form-control form-control-user"
+                          class="form-control"
+                          :class="{ 'is-invalid': $v.email.$error }"
                           id="exampleInputEmail"
                           placeholder="Email"
                           v-model="email"
@@ -53,19 +46,36 @@
                       <div class="form-group">
                         <input
                           type="password"
-                          class="form-control form-control-user"
-                          id="exampleInputPassword"
+                          class="form-control"
+                          :class="{ 'is-invalid': $v.password.$error }"
+                          id="password"
                           placeholder="Senha"
                           v-model="password"
                         />
+                        <div
+                          class="invalid-feedback"
+                          v-if="!$v.password.required"
+                        >
+                          Campo obrigatório
+                        </div>
+                        <div
+                          class="invalid-feedback"
+                          v-if="!$v.password.minLength"
+                        >
+                          Campo precisa ter no mínimo
+                          {{ $v.password.$params.minLength.min }} caracteres.
+                        </div>
+                        <div
+                          class="invalid-feedback"
+                          v-if="!$v.password.maxLength"
+                        >
+                          Campo precisa ter no máximo
+                          {{ $v.password.$params.maxLength.max }} caracteres.
+                        </div>
                       </div>
-                      <a
-                        href=""
-                        class="btn btn-success btn-block"
-                        v-on:click="validateAndSubmit"
-                      >
+                      <button type="submit" class="btn btn-success btn-block">
                         Entrar
-                      </a>
+                      </button>
                     </form>
 
                     <div class="row mt-4">
@@ -110,51 +120,37 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
 import { LOGIN } from '@/store/actions.type'
-import { SET_VALIDATION_ERROR } from '@/store/mutations.type'
-import { validEmail } from '@/common/functions'
-import { required, email, between } from 'vuelidate/lib/validators'
+import { required, email, minLength, maxLength } from 'vuelidate/lib/validators'
 
 export default {
-  name: "LoginComponent",
+  name: 'LoginComponent',
   data() {
     return {
       email: null,
       password: null
     }
   },
-  methods: {
-    validateAndSubmit: function(e) {
-      e.preventDefault()
-      let errors = []
-      if (!this.email) {
-        errors.push('O e-mail é obrigatório.')
-      } else if (!validEmail(this.email)) {
-        errors.push('Utilize um e-mail válido.')
-      }
-      if (!this.password) {
-        errors.push('A senha é obrigatória.')
-      }
-      if (errors.length) {
-        this.[SET_VALIDATION_ERROR](errors)
-      } else {
-        this.$store
-          .dispatch(LOGIN, { email: this.email, password: this.password })
-          .then(() => this.$router.push({ name: 'home' }))
-      }
-      return false;
-    },
-    ...mapMutations([SET_VALIDATION_ERROR]),
-  },
-
   validations: {
     email: {
       required,
       email
     },
     password: {
-      between: between(6, 20)
+      required,
+      minLength: minLength(6),
+      maxLength: maxLength(20)
+    }
+  },
+  methods: {
+    submit: function(e) {
+      e.preventDefault()
+      this.$v.$touch()
+      if (!this.$v.$invalid) {
+        this.$store
+          .dispatch(LOGIN, { email: this.email, password: this.password })
+          .then(() => this.$router.push({ name: 'home' }))
+      }
     }
   }
 }
