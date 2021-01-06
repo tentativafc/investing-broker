@@ -1,14 +1,19 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net"
 
-	"github.com/tentativafc/investing-broker/sts/sts"
+	"github.com/tentativafc/investing-broker/sts-service/sts"
 	"google.golang.org/grpc"
 )
 
-type server struct{}
+type Server struct{}
+
+func (s *Server) GenerateToken(ctx context.Context, tr *sts.TokenRequest) (*sts.TokenResponse, error) {
+	return &sts.TokenResponse{Token: "ABC"}, nil
+}
 
 func main() {
 
@@ -18,7 +23,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	sts.RegisterStsServer(s, &server{})
+	sts.RegisterStsServer(s, &Server{})
 
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("Failed to start server, %v", err)
