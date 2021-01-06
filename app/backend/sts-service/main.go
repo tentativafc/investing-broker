@@ -6,13 +6,23 @@ import (
 	"net"
 
 	"github.com/tentativafc/investing-broker/sts-service/sts"
+	"github.com/tentativafc/investing-broker/sts-service/util"
 	"google.golang.org/grpc"
 )
 
 type Server struct{}
 
 func (s *Server) GenerateToken(ctx context.Context, tr *sts.TokenRequest) (*sts.TokenResponse, error) {
-	return &sts.TokenResponse{Token: "ABC"}, nil
+
+	clientId := tr.ClientId
+
+	token, err := util.GenerateToken(clientId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &sts.TokenResponse{Token: token}, nil
 }
 
 func main() {
