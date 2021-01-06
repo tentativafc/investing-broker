@@ -1,0 +1,17 @@
+syntax="proto3";
+
+package stspb;
+option go_package="stspb";
+
+service Sts {
+    rpc GenerateToken (TokenRequest) returns (TokenResponse) {}
+}
+  
+message TokenRequest {
+    string client_id = 1;
+    string client_secret = 2;
+}
+  
+message TokenResponse {
+    string token = 1;
+}

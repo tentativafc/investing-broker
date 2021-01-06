@@ -111,5 +111,5 @@ func HandleRequests() {
 
 	handler := cors.AllowAll().Handler(router)
 
-	log.Fatal(http.ListenAndServe(":8081", handler))
+	log.Fatal(http.ListenAndServe(":8082", handler))
 }

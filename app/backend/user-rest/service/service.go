@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -10,15 +12,30 @@ import (
 	"github.com/tentativafc/investing-broker/user-rest/dto"
 	errorUR "github.com/tentativafc/investing-broker/user-rest/error"
 	"github.com/tentativafc/investing-broker/user-rest/repo"
+	"github.com/tentativafc/investing-broker/user-rest/stspb"
 	"github.com/tentativafc/investing-broker/user-rest/util"
+	"google.golang.org/grpc"
 )
 
 type UserService struct {
 	ur repo.UserRepository
+	sc stspb.StsClient
 }
 
 func NewUserService(ur repo.UserRepository) UserService {
-	us := UserService{ur: ur}
+
+	cc, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+
+	if err != nil {
+		log.Fatal("Could not connect: %v", err)
+	}
+
+	// defer cc.Close()
+
+	c := stspb.NewStsClient(cc)
+
+	us := UserService{ur: ur, sc: c}
+
 	return us
 }
 
@@ -31,11 +48,12 @@ func (us UserService) CreateUser(u dto.User) (dto.UserResponse, error) {
 		return ur, errorUR.NewGenericError(err.Error())
 
 	}
-	authToken, err := util.CreateToken(userDb.ID)
+
+	tr, err := us.sc.GenerateToken(context.Background(), &stspb.TokenRequest{ClientId: userDb.ID})
 	if err != nil {
 		return ur, errorUR.NewAuthError("Error to generating jwt")
 	}
-	ur = dto.UserResponse{Token: authToken, ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email}
+	ur = dto.UserResponse{Token: tr.Token, ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email}
 	return ur, nil
 }
 
@@ -81,11 +99,11 @@ func (us UserService) Login(l dto.LoginData) (dto.UserResponse, error) {
 	if err != nil {
 		return ur, errorUR.NewNotFoundError("User not found")
 	}
-	authToken, err := util.CreateToken(userDb.ID)
+	tr, err := us.sc.GenerateToken(context.Background(), &stspb.TokenRequest{ClientId: userDb.ID})
 	if err != nil {
 		return ur, errorUR.NewAuthError("Error to generating jwt")
 	}
-	ur = dto.UserResponse{Token: authToken, ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email}
+	ur = dto.UserResponse{Token: tr.Token, ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email}
 	return ur, nil
 }
 
