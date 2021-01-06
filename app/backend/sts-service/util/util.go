@@ -19,7 +19,7 @@ func CreateToken(clientId string) (string, error) {
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
 	token, err := at.SignedString([]byte(ACCESS_SECRET))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 	return token, nil
 }

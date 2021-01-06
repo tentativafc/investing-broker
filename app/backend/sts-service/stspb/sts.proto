@@ -1,7 +1,7 @@
 syntax="proto3";
 
-package sts;
-option go_package="sts";
+package stspb;
+option go_package="stspb";
 
 service Sts {
     rpc GenerateToken (TokenRequest) returns (TokenResponse) {}

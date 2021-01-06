@@ -4,7 +4,7 @@
 // 	protoc        v3.14.0
 // source: sts.proto
 
-package sts
+package stspb
 
 import (
 	context "context"
