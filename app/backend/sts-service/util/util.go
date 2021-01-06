@@ -8,8 +8,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-const ACCESS_SECRET = "mamaandtito"
-
 func CreateToken(clientId string) (string, error) {
 	var err error
 	atClaims := jwt.MapClaims{}

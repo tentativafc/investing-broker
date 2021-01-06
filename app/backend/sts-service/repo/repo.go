@@ -57,7 +57,7 @@ func DbInit() *gorm.DB {
 	var err error
 	db, err := gorm.Open(postgres.Open(dbConfigs), &gorm.Config{})
 	if err != nil {
-		panic("failed to connect database")
+		panic("Failed to connect database")
 	}
 	db.AutoMigrate(&ClientCredentials{})
 	return db
