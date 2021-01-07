@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -24,7 +25,7 @@ type UserService struct {
 
 func NewUserService(ur repo.UserRepository) UserService {
 
-	cc, err := grpc.Dial("sts_server:50051", grpc.WithInsecure())
+	cc, err := grpc.Dial("sts_service:50051", grpc.WithInsecure())
 
 	if err != nil {
 		log.Fatal("Could not connect: %v", err)
@@ -101,6 +102,7 @@ func (us UserService) Login(l dto.LoginData) (dto.UserResponse, error) {
 	}
 	tr, err := us.sc.GenerateToken(context.Background(), &stspb.TokenRequest{ClientId: userDb.ID})
 	if err != nil {
+		fmt.Println("Error %v", err)
 		return ur, errorUR.NewAuthError("Error to generating jwt")
 	}
 	ur = dto.UserResponse{Token: tr.Token, ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email}
@@ -151,5 +153,6 @@ func (us UserService) GetuserById(authorization string, userId string) (dto.User
 		err = errorUR.NewNotFoundError("User not found")
 		return dto.UserResponse{}, err
 	}
+
 	return dto.UserResponse{ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email, Token: token}, nil
 }

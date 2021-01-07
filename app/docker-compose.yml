@@ -51,7 +51,6 @@ services:
   #   volumes:
   #     - ./docker/mongo-data-selic:/data/db
   #     - ./db-init-scripts/mongo-init-selic.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-
     
   sts_service:
     build: 
@@ -75,10 +74,8 @@ services:
     depends_on: 
       - postgres
       - sts_service
-
-
   
-      # frontend:
+  # frontend:
   #   build: 
   #     dockerfile: Dockerfile
   #     context: ./frontend/app

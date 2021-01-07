@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -111,6 +112,6 @@ func HandleRequests() {
 
 	handler := cors.AllowAll().Handler(router)
 
-	fmt.Log("Starting...")
+	fmt.Println("Starting...")
 	log.Fatal(http.ListenAndServe(":8081", handler))
 }
