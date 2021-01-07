@@ -9,11 +9,11 @@ import (
 
 	"strings"
 
-	"github.com/tentativafc/investing-broker/user-rest/dto"
-	errorUR "github.com/tentativafc/investing-broker/user-rest/error"
-	"github.com/tentativafc/investing-broker/user-rest/repo"
-	"github.com/tentativafc/investing-broker/user-rest/stspb"
-	"github.com/tentativafc/investing-broker/user-rest/util"
+	"github.com/tentativafc/investing-broker/user-service/dto"
+	errorUR "github.com/tentativafc/investing-broker/user-service/error"
+	"github.com/tentativafc/investing-broker/user-service/repo"
+	"github.com/tentativafc/investing-broker/user-service/stspb"
+	"github.com/tentativafc/investing-broker/user-service/util"
 	"google.golang.org/grpc"
 )
 
@@ -24,7 +24,7 @@ type UserService struct {
 
 func NewUserService(ur repo.UserRepository) UserService {
 
-	cc, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+	cc, err := grpc.Dial("sts_server:50051", grpc.WithInsecure())
 
 	if err != nil {
 		log.Fatal("Could not connect: %v", err)

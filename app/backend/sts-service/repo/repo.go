@@ -53,7 +53,7 @@ func NewClientCredentialsRepository() ClientCredentialsRepository {
 }
 
 func DbInit() *gorm.DB {
-	dbConfigs := "host=localhost user=postgres password=123456 dbname=postgres port=5432"
+	dbConfigs := "host=postgres user=postgres password=123456 dbname=postgres port=5432"
 	var err error
 	db, err := gorm.Open(postgres.Open(dbConfigs), &gorm.Config{})
 	if err != nil {

@@ -9,3 +9,5 @@ app/backend/docker/**
 /analytics/docker/**
 
 .vscode/
+
+app/docker/

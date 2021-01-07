@@ -81,11 +81,11 @@ func NewUserRepository() UserRepository {
 }
 
 func DbInit() *gorm.DB {
-	dbConfigs := "host=localhost user=postgres password=123456 dbname=postgres port=5432"
+	dbConfigs := "host=postgres user=postgres password=123456 dbname=postgres port=5432"
 	var err error
 	db, err := gorm.Open(postgres.Open(dbConfigs), &gorm.Config{})
 	if err != nil {
-		panic("failed to connect database")
+		panic("Failed to connect database")
 	}
 	db.AutoMigrate(&UserDB{})
 	db.AutoMigrate(&RecoverLoginDB{})

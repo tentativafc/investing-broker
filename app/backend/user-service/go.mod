@@ -1,4 +1,4 @@
-module github.com/tentativafc/investing-broker/user-rest
+module github.com/tentativafc/investing-broker/user-service
 
 go 1.15
 

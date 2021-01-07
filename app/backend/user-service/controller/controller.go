@@ -7,10 +7,10 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
-	"github.com/tentativafc/investing-broker/user-rest/dto"
-	errorUR "github.com/tentativafc/investing-broker/user-rest/error"
-	"github.com/tentativafc/investing-broker/user-rest/repo"
-	"github.com/tentativafc/investing-broker/user-rest/service"
+	"github.com/tentativafc/investing-broker/user-service/dto"
+	errorUR "github.com/tentativafc/investing-broker/user-service/error"
+	"github.com/tentativafc/investing-broker/user-service/repo"
+	"github.com/tentativafc/investing-broker/user-service/service"
 )
 
 var ur repo.UserRepository = repo.NewUserRepository()
@@ -111,5 +111,6 @@ func HandleRequests() {
 
 	handler := cors.AllowAll().Handler(router)
 
-	log.Fatal(http.ListenAndServe(":8082", handler))
+	fmt.Log("Starting...")
+	log.Fatal(http.ListenAndServe(":8081", handler))
 }
