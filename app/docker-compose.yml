@@ -11,7 +11,7 @@ services:
       - ./docker/postgres-data-user:/var/lib/postgresql/data
       - ./db-init-scripts:/docker-entrypoint-initdb.d
     ports:
-      - '5432:5432'
+      - 5432:5432
 
   mongo_ibovespa_assets:
     image: mongo:4.4.2
@@ -21,7 +21,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=123456
       - MONGO_INITDB_DATABASE=ibovespa_assets
     ports:
-      - '27017:27017'
+      - 27017:27017
     volumes:
       - ./docker/mongo-data-ibovespa-assets:/data/db
       - ./db-init-scripts/mongo-init-ibovespa-assets.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
@@ -34,7 +34,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=123456
       - MONGO_INITDB_DATABASE=currency
     ports:
-      - '27018:27017'
+      - 27018:27017
     volumes:
       - ./docker/mongo-data-currency:/data/db
       - ./db-init-scripts/mongo-init-currency.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
@@ -47,7 +47,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=123456
       - MONGO_INITDB_DATABASE=selic
     ports:
-      - '27019:27017'
+      - 27019:27017
     volumes:
       - ./docker/mongo-data-selic:/data/db
       - ./db-init-scripts/mongo-init-selic.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
@@ -60,7 +60,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=123456
       - MONGO_INITDB_DATABASE=sts
     ports:
-      - '27020:27017'
+      - 27020:27017
     volumes:
       - ./docker/mongo-data-sts:/data/db
       - ./db-init-scripts/mongo-init-sts.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
@@ -71,7 +71,7 @@ services:
       dockerfile: Dockerfile
       context: ./backend/sts-service
     ports:
-      - '50051:50051'
+      - 50051:50051
     volumes: 
       - ./backend/sts-service:/app
     depends_on: 
@@ -82,7 +82,7 @@ services:
       dockerfile: Dockerfile
       context: ./backend/user-service
     ports:
-      - '8081:8081'
+      - 8081:8081
     volumes: 
       - ./backend/user-service:/app
     depends_on: 
@@ -109,7 +109,7 @@ services:
     volumes: 
       - ./backend/scrapers/currency:/app
     depends_on: 
-      - mongo_currency
+      - mongo_ibovespa_assets
 
   scraper_selic:
     build: 
@@ -120,7 +120,7 @@ services:
     volumes: 
       - ./backend/scrapers/selic:/app
     depends_on: 
-      - mongo_selic
+      - mongo_ibovespa_assets
 
   frontend:
     build: 

@@ -70,7 +70,7 @@ class Scraper {
         upsert: true, // Make this update into an upsert
       });
     } catch (error) {
-      throw new Exception("Error to load Ibovespa Assets.");
+      throw new Error("Error to load Ibovespa Assets.");
     }
   }
 }
