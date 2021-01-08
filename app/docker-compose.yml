@@ -13,44 +13,58 @@ services:
     ports:
       - '5432:5432'
 
-  # mongo_ibovespa_assets:
-  #   image: mongo:4.4.2
-  #   restart: always
-  #   environment:
-  #     - MONGO_INITDB_ROOT_USERNAME=mongo
-  #     - MONGO_INITDB_ROOT_PASSWORD=123456
-  #     - MONGO_INITDB_DATABASE=ibovespa_assets
-  #   ports:
-  #     - '27017:27017'
-  #   volumes:
-  #     - ./docker/mongo-data-ibovespa-assets:/data/db
-  #     - ./db-init-scripts/mongo-init-ibovespa-assets.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+  mongo_ibovespa_assets:
+    image: mongo:4.4.2
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongo
+      - MONGO_INITDB_ROOT_PASSWORD=123456
+      - MONGO_INITDB_DATABASE=ibovespa_assets
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./docker/mongo-data-ibovespa-assets:/data/db
+      - ./db-init-scripts/mongo-init-ibovespa-assets.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
-  # mongo_currency:
-  #   image: mongo:4.4.2
-  #   restart: always
-  #   environment:
-  #     - MONGO_INITDB_ROOT_USERNAME=mongo
-  #     - MONGO_INITDB_ROOT_PASSWORD=123456
-  #     - MONGO_INITDB_DATABASE=currency
-  #   ports:
-  #     - '27018:27017'
-  #   volumes:
-  #     - ./docker/mongo-data-currency:/data/db
-  #     - ./db-init-scripts/mongo-init-currency.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+  mongo_currency:
+    image: mongo:4.4.2
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongo
+      - MONGO_INITDB_ROOT_PASSWORD=123456
+      - MONGO_INITDB_DATABASE=currency
+    ports:
+      - '27018:27017'
+    volumes:
+      - ./docker/mongo-data-currency:/data/db
+      - ./db-init-scripts/mongo-init-currency.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
-  # mongo_selic:
-  #   image: mongo:4.4.2
-  #   restart: always
-  #   environment:
-  #     - MONGO_INITDB_ROOT_USERNAME=mongo
-  #     - MONGO_INITDB_ROOT_PASSWORD=123456
-  #     - MONGO_INITDB_DATABASE=selic
-  #   ports:
-  #     - '27019:27017'
-  #   volumes:
-  #     - ./docker/mongo-data-selic:/data/db
-  #     - ./db-init-scripts/mongo-init-selic.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+  mongo_selic:
+    image: mongo:4.4.2
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongo
+      - MONGO_INITDB_ROOT_PASSWORD=123456
+      - MONGO_INITDB_DATABASE=selic
+    ports:
+      - '27019:27017'
+    volumes:
+      - ./docker/mongo-data-selic:/data/db
+      - ./db-init-scripts/mongo-init-selic.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
+  mongo_sts:
+    image: mongo:4.4.2
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongo
+      - MONGO_INITDB_ROOT_PASSWORD=123456
+      - MONGO_INITDB_DATABASE=sts
+    ports:
+      - '27020:27017'
+    volumes:
+      - ./docker/mongo-data-sts:/data/db
+      - ./db-init-scripts/mongo-init-sts.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
     
   sts_service:
     build: 
@@ -75,13 +89,16 @@ services:
       - postgres
       - sts_service
   
-  # frontend:
-  #   build: 
-  #     dockerfile: Dockerfile
-  #     context: ./frontend/app
-  #   ports:
-  #     - '3000:3000'
-  #   volumes: 
-  #     - /app/node_modules
-  #     - ./frontend/app:/app
+  frontend:
+    build: 
+      dockerfile: Dockerfile
+      context: ./frontend/app
+    ports:
+      - '3000:8080'
+    volumes: 
+      - /app/node_modules
+      - ./frontend/app:/app
+    depends_on: 
+      - user_service
+
 

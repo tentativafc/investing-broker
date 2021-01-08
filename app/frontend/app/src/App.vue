@@ -25,3 +25,4 @@ export default {
 html {
   font-size: 100%;
 }
+</style>
