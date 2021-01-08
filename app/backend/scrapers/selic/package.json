@@ -4,7 +4,7 @@
   "description": "Scraper of selic index",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node src/app.js",
     "start-dev": "nodemon src/app.js"
   },
   "repository": {

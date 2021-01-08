@@ -88,7 +88,40 @@ services:
     depends_on: 
       - postgres
       - sts_service
-  
+
+  scraper_ibovespa_assets:
+    build: 
+      dockerfile: Dockerfile
+      context: ./backend/scrapers/ibovespa-assets
+    ports:
+      - '8082:3000'
+    volumes: 
+      - ./backend/scrapers/ibovespa-assets:/app
+    depends_on: 
+      - mongo_ibovespa_assets
+
+  scraper_currency:
+    build: 
+      dockerfile: Dockerfile
+      context: ./backend/scrapers/currency
+    ports:
+      - '8083:3000'
+    volumes: 
+      - ./backend/scrapers/currency:/app
+    depends_on: 
+      - mongo_currency
+
+  scraper_selic:
+    build: 
+      dockerfile: Dockerfile
+      context: ./backend/scrapers/selic
+    ports:
+      - '8084:3000'
+    volumes: 
+      - ./backend/scrapers/selic:/app
+    depends_on: 
+      - mongo_selic
+
   frontend:
     build: 
       dockerfile: Dockerfile
