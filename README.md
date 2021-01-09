@@ -22,6 +22,7 @@ docker-compose up
 | Currency-Scraper        | 8083        | Rest      |
 | Selic-Scraper           | 8084        | Rest      |
 | Frontend                | 3000        | Vue       |
+| Nginx                   | 3051       ! HTTP Server | 
 
 Postman collection of project: investing.postman_collection.json
 
