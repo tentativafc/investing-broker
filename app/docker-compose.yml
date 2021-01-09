@@ -122,6 +122,7 @@ services:
       - mongo_ibovespa_assets
 
   frontend:
+    restart: always
     build: 
       dockerfile: Dockerfile
       context: ./frontend/app
