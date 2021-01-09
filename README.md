@@ -9,20 +9,20 @@ docker-compose up
 
 ### Services and port numbers
 
-| Service                 | Port Number | Type/Tech |
-| ----------------------- | ----------- | --------- |
-| Postgres                | 5432        | DB        |
-| Mongo-IbovespaAssets    | 27017       | DB        |
-| Mongo-Currency          | 27018       | DB        |
-| Mongo-Selic             | 27019       | DB        |
-| Mongo-Sts               | 27020       | DB        |
-| Sts-Service             | 50051       | gRpc      |
-| User-Service            | 8081        | Rest      |
-| Ibovespa-Assets-Scraper | 8082        | Rest      |
-| Currency-Scraper        | 8083        | Rest      |
-| Selic-Scraper           | 8084        | Rest      |
-| Frontend                | 3000        | Vue       |
-| Nginx                   | 3051       ! HTTP Server | 
+| Service                 | Port Number | Type/Tech   |
+| ----------------------- | ----------- | ----------- |
+| Postgres                | 5432        | DB          |
+| Mongo-IbovespaAssets    | 27017       | DB          |
+| Mongo-Currency          | 27018       | DB          |
+| Mongo-Selic             | 27019       | DB          |
+| Mongo-Sts               | 27020       | DB          |
+| Sts-Service             | 50051       | gRpc        |
+| User-Service            | 8081        | Rest        |
+| Ibovespa-Assets-Scraper | 8082        | Rest        |
+| Currency-Scraper        | 8083        | Rest        |
+| Selic-Scraper           | 8084        | Rest        |
+| Frontend                | 3000        | Vue         |
+| Nginx                   | 80          | HTTP Server |
 
 Postman collection of project: investing.postman_collection.json
 
@@ -62,3 +62,9 @@ Postman collection of project: investing.postman_collection.json
 - [Metatrader5 Python lib](https://www.mql5.com/pt/docs/integration/python_metatrader5)
 
 - [TAlib Python](https://technical-analysis-library-in-python.readthedocs.io/en/latest/ta.html#trend-indicators)
+
+### Commands:
+
+```sh
+docker rm -f $(docker container  ls -aq)
+```

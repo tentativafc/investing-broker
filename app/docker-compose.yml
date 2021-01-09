@@ -1,5 +1,10 @@
 version: '3'
 
+networks:
+  investing-network:
+    driver: bridge
+
+
 services:
   postgres:
     image: 'postgres:13.1-alpine'
@@ -11,7 +16,9 @@ services:
       - ./docker/postgres-data-user:/var/lib/postgresql/data
       - ./db-init-scripts:/docker-entrypoint-initdb.d
     ports:
-      - 5432:5432
+      - 5432:5432    
+    networks:
+      - investing-network
 
   mongo_ibovespa_assets:
     image: mongo:4.4.2
@@ -22,6 +29,8 @@ services:
       - MONGO_INITDB_DATABASE=ibovespa_assets
     ports:
       - 27017:27017
+    networks:
+      - investing-network
     volumes:
       - ./docker/mongo-data-ibovespa-assets:/data/db
       - ./db-init-scripts/mongo-init-ibovespa-assets.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
@@ -35,6 +44,8 @@ services:
       - MONGO_INITDB_DATABASE=currency
     ports:
       - 27018:27017
+    networks:
+      - investing-network
     volumes:
       - ./docker/mongo-data-currency:/data/db
       - ./db-init-scripts/mongo-init-currency.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
@@ -48,6 +59,8 @@ services:
       - MONGO_INITDB_DATABASE=selic
     ports:
       - 27019:27017
+    networks:
+      - investing-network
     volumes:
       - ./docker/mongo-data-selic:/data/db
       - ./db-init-scripts/mongo-init-selic.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
@@ -61,6 +74,8 @@ services:
       - MONGO_INITDB_DATABASE=sts
     ports:
       - 27020:27017
+    networks:
+      - investing-network
     volumes:
       - ./docker/mongo-data-sts:/data/db
       - ./db-init-scripts/mongo-init-sts.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
@@ -71,6 +86,8 @@ services:
       context: ./backend/sts-service
     ports:
       - 50051:50051
+    networks:
+      - investing-network
     volumes: 
       - ./backend/sts-service:/app
     depends_on: 
@@ -82,6 +99,8 @@ services:
       context: ./backend/user-service
     ports:
       - 8081:8081
+    networks:
+      - investing-network
     volumes: 
       - ./backend/user-service:/app
     depends_on: 
@@ -94,6 +113,8 @@ services:
       context: ./backend/scrapers/ibovespa-assets
     ports:
       - '8082:3000'
+    networks:
+      - investing-network
     volumes: 
       - ./backend/scrapers/ibovespa-assets:/app
     depends_on: 
@@ -105,6 +126,8 @@ services:
       context: ./backend/scrapers/currency
     ports:
       - '8083:3000'
+    networks:
+      - investing-network
     volumes: 
       - ./backend/scrapers/currency:/app
     depends_on: 
@@ -116,6 +139,8 @@ services:
       context: ./backend/scrapers/selic
     ports:
       - '8084:3000'
+    networks:
+      - investing-network
     volumes: 
       - ./backend/scrapers/selic:/app
     depends_on: 
@@ -128,6 +153,8 @@ services:
       context: ./frontend/app
     ports:
       - '3000:8080'
+    networks:
+      - investing-network
     volumes: 
       - /app/node_modules
       - ./frontend/app:/app
@@ -135,11 +162,17 @@ services:
       - user_service
 
   nginx:
-    restart: always
-    build: 
-      dockerfile: Dockerfile
-      context: ./nginx
+    image: nginx:1.19.6
+    restart: always    
     ports: 
-      - '3051:80'
-
+      - 80:80
+      - 443:443
+    networks:
+      - investing-network
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - user_service
+      - scraper_ibovespa_assets
+      - scraper_currency
 

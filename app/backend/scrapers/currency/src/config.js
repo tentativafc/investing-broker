@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
-const url =
-  "mongodb://mongouser:mongopass@mongo_ibovespa_assets:27017/ibovespa_assets";
+const url = "mongodb://mongouser:mongopass@mongo_currency:27017/currency";
 
 mongoose.connect(url, { useFindAndModify: false });
 
