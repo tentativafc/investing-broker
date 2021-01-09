@@ -65,7 +65,6 @@ services:
       - ./docker/mongo-data-sts:/data/db
       - ./db-init-scripts/mongo-init-sts.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
-    
   sts_service:
     build: 
       dockerfile: Dockerfile
@@ -133,5 +132,13 @@ services:
       - ./frontend/app:/app
     depends_on: 
       - user_service
+
+  nginx:
+    restart: always
+    build: 
+      dockerfile: Dockerfile
+      context: ./nginx
+    ports: 
+      - '3051:80'
 
 
