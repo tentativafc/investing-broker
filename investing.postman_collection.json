@@ -1,0 +1,335 @@
+{
+	"info": {
+		"_postman_id": "eba53c20-37f7-40c3-a119-1cef4d186b9f",
+		"name": "investing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "CreateUser",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"firstname\" : \"Marcelo\",\n   \"lastname\" : \"Santana\",\n   \"email\": \"tentativafc@gmail.com\",\n   \"password\": \"123456\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateUser",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2MDg5MzA4OTMsInVzZXJfaWQiOiI5ZjNhMTAyZi1iMzkzLTRkZDktODk3My1jYjE4YmUxOGVhYmEifQ.0D9qPB9w7EuJeuT-MBACkFi8X6Z2uDYhKwaBAx99Hfo",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"firstname\" : \"Marceloo\",\n   \"lastname\" : \"Santana\",\n   \"email\": \"tentativafc@gmail.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/users/9f3a102f-b393-4dd9-8973-cb18be18eaba",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"users",
+						"9f3a102f-b393-4dd9-8973-cb18be18eaba"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"email\": \"tentativafc@gmail.com\",\n   \"password\": \"123456\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/users/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"users",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetById",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/users/231f5d33-f0f9-42aa-849e-be2d02bfff48",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"users",
+						"231f5d33-f0f9-42aa-849e-be2d02bfff48"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "IBOVESPA_ASSETS_POST",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"firstname\" : \"Marcelo\",\n   \"lastname\" : \"Santana\",\n   \"email\": \"tentativafc@gmail.com\",\n   \"password\": \"123456\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/api/ibovespa_assets",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"api",
+						"ibovespa_assets"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "IBOVESPA_ASSETS_GET",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8082/api/ibovespa_assets",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"api",
+						"ibovespa_assets"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CURRENCY_PRICES_POST",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"firstname\" : \"Marcelo\",\n   \"lastname\" : \"Santana\",\n   \"email\": \"tentativafc@gmail.com\",\n   \"password\": \"123456\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8083/api/currency",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"api",
+						"currency"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CURRENCY_PRICES_GET",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"firstname\" : \"Marcelo\",\n   \"lastname\" : \"Santana\",\n   \"email\": \"tentativafc@gmail.com\",\n   \"password\": \"123456\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8083/api/currency?symbol=USD&begin_date=20200101&final_date=20210101",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8083",
+					"path": [
+						"api",
+						"currency"
+					],
+					"query": [
+						{
+							"key": "symbol",
+							"value": "USD"
+						},
+						{
+							"key": "begin_date",
+							"value": "20200101"
+						},
+						{
+							"key": "final_date",
+							"value": "20210101"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SELIC_POST",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"firstname\" : \"Marcelo\",\n   \"lastname\" : \"Santana\",\n   \"email\": \"tentativafc@gmail.com\",\n   \"password\": \"123456\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8084/api/selic",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"selic"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SELIC_GET",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8084/api/selic?begin_date=20200101&final_date=20210101",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8084",
+					"path": [
+						"api",
+						"selic"
+					],
+					"query": [
+						{
+							"key": "begin_date",
+							"value": "20200101"
+						},
+						{
+							"key": "final_date",
+							"value": "20210101"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
