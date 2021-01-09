@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sts-service
+  labels:
+    component: api
+spec:
+  containers:
+    - name: sts-service
+      image: sts-service
+      ports:
+        - containerPort: 50051
+    

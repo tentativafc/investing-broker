@@ -1,4 +1,4 @@
-module github.com/tentativafc/investing-broker/user-service
+module github.com/tentativafc/investing-broker/app/backend/user-service
 
 go 1.15
 

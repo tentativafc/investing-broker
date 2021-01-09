@@ -68,3 +68,7 @@ Postman collection of project: investing.postman_collection.json
 ```sh
 docker rm -f $(docker container  ls -aq)
 ```
+
+```sh
+minikube start
+```
