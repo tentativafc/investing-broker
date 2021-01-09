@@ -152,7 +152,7 @@ services:
       dockerfile: Dockerfile
       context: ./frontend/app
     ports:
-      - '3000:8080'
+      - '8080:8080'
     networks:
       - investing-network
     volumes: 
@@ -175,4 +175,5 @@ services:
       - user_service
       - scraper_ibovespa_assets
       - scraper_currency
+      - frontend
 

@@ -21,7 +21,7 @@ docker-compose up
 | Ibovespa-Assets-Scraper | 8082        | Rest        |
 | Currency-Scraper        | 8083        | Rest        |
 | Selic-Scraper           | 8084        | Rest        |
-| Frontend                | 3000        | Vue         |
+| Frontend                | 8080        | Vue         |
 | Nginx                   | 80          | HTTP Server |
 
 Postman collection of project: investing.postman_collection.json
