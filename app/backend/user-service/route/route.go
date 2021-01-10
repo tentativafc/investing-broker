@@ -8,10 +8,10 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
-	"github.com/tentativafc/investing-broker/user-service/dto"
-	errorUR "github.com/tentativafc/investing-broker/user-service/error"
-	"github.com/tentativafc/investing-broker/user-service/repo"
-	"github.com/tentativafc/investing-broker/user-service/service"
+	"github.com/tentativafc/investing-broker/app/backend/user-service/dto"
+	errorUR "github.com/tentativafc/investing-broker/app/backend/user-service/error"
+	"github.com/tentativafc/investing-broker/app/backend/user-service/repo"
+	"github.com/tentativafc/investing-broker/app/backend/user-service/service"
 )
 
 var ur repo.UserRepository = repo.NewUserRepository()

@@ -3,13 +3,13 @@ package repo
 import (
 	"time"
 
+	"github.com/tentativafc/investing-broker/app/backend/sts-service/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 type ClientCredentials struct {
-	ID           string `gorm:"primarykey"`
-	ClientName   string `gorm:"not null"`
+	ClientName   string `gorm:"primarykey"`
 	ClientId     string `gorm:"not null"`
 	ClientSecret string `gorm:"not null"`
 	CreatedAt    time.Time
@@ -32,33 +32,19 @@ func (ccr ClientCredentialsRepository) CreateClientCredentials(cr ClientCredenti
 	return cr, nil
 }
 
-func (ccr ClientCredentialsRepository) UpdateClientCredentials(cr ClientCredentials) (ClientCredentials, error) {
-	err := ccr.db.Updates(&cr).Error
-	if err != nil {
-		return ClientCredentials{}, err
-	}
-	return cr, nil
-}
-
-func (cr ClientCredentialsRepository) FindByClientId(clientId string) (ClientCredentials, error) {
+func (ccr ClientCredentialsRepository) FindByClientId(clientId string) (ClientCredentials, error) {
 	var cr ClientCredentials
-	err := cr.db.Where("client_id = ?", ClientId).First(&cr).Error
+	err := ccr.db.Where("client_id = ?", clientId).First(&cr).Error
 	return cr, err
 }
 
 func NewClientCredentialsRepository() ClientCredentialsRepository {
-	db := DbInit()
-	ur := ClientCredentialsRepository{db: db}
-	return ur
-}
-
-func DbInit() *gorm.DB {
-	dbConfigs := "host=postgres user=postgres password=123456 dbname=postgres port=5432"
 	var err error
-	db, err := gorm.Open(postgres.Open(dbConfigs), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(config.GetDbConfig()), &gorm.Config{})
 	if err != nil {
 		panic("Failed to connect database")
 	}
 	db.AutoMigrate(&ClientCredentials{})
-	return db
+	ccr := ClientCredentialsRepository{db: db}
+	return ccr
 }
