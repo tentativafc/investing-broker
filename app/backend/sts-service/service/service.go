@@ -8,25 +8,33 @@ import (
 	"github.com/pkg/errors"
 	"github.com/tentativafc/investing-broker/app/backend/sts-service/dto"
 	"github.com/tentativafc/investing-broker/app/backend/sts-service/repo"
+
+	errorSts "github.com/tentativafc/investing-broker/app/backend/sts-service/error"
 )
 
 type StsService struct {
 	ccr repo.ClientCredentialsRepository
 }
 
-func (s StsService) CreateClientCredentials(ccr dto.ClientCredentialsRequest) (dto.ClientCredentials, error) {
+func (s StsService) CreateClientCredentials(ccr dto.ClientCredentialsRequest) (*dto.ClientCredentials, error) {
 
 	err := ccr.Validate()
 	if err != nil {
-		return dto.ClientCredentials{}, err
+		return nil, errorSts.NewBadRequestError(err.Error())
 	}
-
-	cc := repo.ClientCredentials{ClientName: ccr.ClientName, ClientId: uuid.New().String(), ClientSecret: uuid.New().String(), CreatedAt: time.Now()}
+	cc, err := repo.NewClientCredentialsRepository().FindByClientName(ccr.ClientName)
+	if err != nil {
+		return nil, errorSts.NewGenericError("Error to find client credentials by Client Name.")
+	}
+	if cc != nil {
+		return nil, errorSts.NewBadRequestError("Client credentials already exists with this Client Name.")
+	}
+	cc = &repo.ClientCredentials{ClientName: ccr.ClientName, ClientId: uuid.New().String(), ClientSecret: uuid.New().String(), CreatedAt: time.Now()}
 	_, err = s.ccr.CreateClientCredentials(cc)
 	if err != nil {
-		return dto.ClientCredentials{}, err
+		return nil, errorSts.NewGenericError("Error to create client credentials.")
 	}
-	return dto.ClientCredentials{ClientName: cc.ClientName, ClientId: cc.ClientId, ClientSecret: cc.ClientSecret}, nil
+	return &dto.ClientCredentials{ClientName: cc.ClientName, ClientId: cc.ClientId, ClientSecret: cc.ClientSecret}, nil
 }
 
 func (s StsService) CreateToken(clientId string, clientSecret string) (string, error) {

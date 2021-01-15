@@ -11,3 +11,5 @@ app/backend/docker/**
 .vscode/
 
 app/docker/
+
+/**/__debug_bin

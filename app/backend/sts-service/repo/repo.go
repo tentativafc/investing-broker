@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"errors"
 	"time"
 
 	"github.com/tentativafc/investing-broker/app/backend/sts-service/config"
@@ -24,18 +25,30 @@ type ClientCredentialsRepository struct {
 	db *gorm.DB
 }
 
-func (ccr ClientCredentialsRepository) CreateClientCredentials(cr ClientCredentials) (ClientCredentials, error) {
-	err := ccr.db.Create(&cr).Error
+func (ccr ClientCredentialsRepository) CreateClientCredentials(cr *ClientCredentials) (*ClientCredentials, error) {
+	err := ccr.db.Create(cr).Error
 	if err != nil {
-		return ClientCredentials{}, err
+		return nil, err
 	}
 	return cr, nil
 }
 
-func (ccr ClientCredentialsRepository) FindByClientId(clientId string) (ClientCredentials, error) {
+func (ccr ClientCredentialsRepository) FindByClientId(clientId string) (*ClientCredentials, error) {
 	var cr ClientCredentials
-	err := ccr.db.Where("client_id = ?", clientId).First(&cr).Error
-	return cr, err
+	err := ccr.db.Where("client_id = ?", clientId).First(cr).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	return &cr, err
+}
+
+func (ccr ClientCredentialsRepository) FindByClientName(clientName string) (*ClientCredentials, error) {
+	var cr ClientCredentials
+	err := ccr.db.Where("client_name = ?", clientName).First(&cr).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	return &cr, err
 }
 
 func NewClientCredentialsRepository() ClientCredentialsRepository {

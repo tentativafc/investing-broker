@@ -5,30 +5,52 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/tentativafc/investing-broker/app/backend/sts-service/dto"
+	errSts "github.com/tentativafc/investing-broker/app/backend/sts-service/error"
 	"github.com/tentativafc/investing-broker/app/backend/sts-service/service"
 )
+
+func Recovery() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				switch err.(type) {
+				case *errSts.AuthError:
+					error := err.(*errSts.AuthError)
+					c.JSON(error.Code(), gin.H{"error": error.Error()})
+				case *errSts.NotFoundError:
+					error := err.(*errSts.NotFoundError)
+					c.JSON(error.Code(), gin.H{"error": error.Error()})
+				case *errSts.BadRequestError:
+					error := err.(*errSts.BadRequestError)
+					c.JSON(error.Code(), gin.H{"error": error.Error()})
+				case *errSts.GenericError:
+					error := err.(*errSts.GenericError)
+					c.JSON(error.Code(), gin.H{"error": error.Error()})
+				}
+			}
+		}()
+		c.Next()
+	}
+}
 
 func CreateRoutes(s service.StsService) {
 
 	r := gin.Default()
+	r.Use(gin.Logger())
+	r.Use(Recovery())
+
 	r.POST("/client_credentials", func(c *gin.Context) {
-
 		var req dto.ClientCredentialsRequest
-
 		if err := c.ShouldBindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
+			panic(errSts.NewBadRequestError("Error to parse body."))
 		}
-
 		cc, err := s.CreateClientCredentials(req)
-
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, err)
+			panic(err)
+		} else {
+			c.JSON(http.StatusOK, cc)
 		}
-
-		c.JSON(http.StatusOK, cc)
-
 	})
 
-	r.Run()
+	r.Run(":8080")
 }
