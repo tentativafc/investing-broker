@@ -38,11 +38,24 @@ func (s *Server) HandleError(err error) error {
 
 }
 
-func (s *Server) GenerateToken(ctx context.Context, tr *stspb.TokenRequest) (*stspb.TokenResponse, error) {
+func (s *Server) GenerateClientCredentials(ctx context.Context, req *stspb.GenerateClientCredentialsRequest) (*stspb.GenerateClientCredentialsResponse, error) {
 
-	dtr := dto.TokenRequest{ClientId: tr.ClientId, ClientSecret: tr.ClientSecret}
+	dtr := dto.ClientCredentialsRequest{ClientName: req.GetClientName()}
 
-	token, err := s.s.CreateToken(dtr)
+	cc, err := s.s.GenerateClientCredentials(dtr)
+
+	if err != nil {
+		return nil, s.HandleError(err)
+	}
+
+	return &stspb.GenerateClientCredentialsResponse{ClientName: cc.ClientName, ClientId: cc.ClientId, ClientSecret: cc.ClientSecret}, nil
+}
+
+func (s *Server) GenerateToken(ctx context.Context, req *stspb.TokenRequest) (*stspb.TokenResponse, error) {
+
+	dtr := dto.TokenRequest{ClientId: req.GetClientId(), ClientSecret: req.GetClientSecret()}
+
+	token, err := s.s.GenerateToken(dtr)
 
 	if err != nil {
 		return nil, s.HandleError(err)
@@ -51,9 +64,9 @@ func (s *Server) GenerateToken(ctx context.Context, tr *stspb.TokenRequest) (*st
 	return &stspb.TokenResponse{Token: token}, nil
 }
 
-func (s *Server) ValidateToken(ctx context.Context, tr *stspb.ValidateTokenRequest) (*stspb.ValidateTokenResponse, error) {
+func (s *Server) ValidateToken(ctx context.Context, req *stspb.ValidateTokenRequest) (*stspb.ValidateTokenResponse, error) {
 
-	dreq := dto.ValidateTokenRequest{Token: tr.Token}
+	dreq := dto.ValidateTokenRequest{Token: req.GetToken()}
 
 	dresp, err := s.s.ValidateToken(dreq)
 

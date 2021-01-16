@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/tentativafc/investing-broker/app/backend/user-service/controller"
+	"github.com/tentativafc/investing-broker/app/backend/user-service/route"
 )
 
 func main() {
 
-	controller.HandleRequests()
+	route.HandleRequests()
 }

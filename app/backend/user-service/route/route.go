@@ -1,15 +1,11 @@
-package controller
+package route
 
 import (
-	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
-	"github.com/rs/cors"
+	"github.com/gin-gonic/gin"
 	"github.com/tentativafc/investing-broker/app/backend/user-service/dto"
-	errorUR "github.com/tentativafc/investing-broker/app/backend/user-service/error"
+	errUs "github.com/tentativafc/investing-broker/app/backend/user-service/error"
 	"github.com/tentativafc/investing-broker/app/backend/user-service/repo"
 	"github.com/tentativafc/investing-broker/app/backend/user-service/service"
 )
@@ -17,101 +13,109 @@ import (
 var ur repo.UserRepository = repo.NewUserRepository()
 var us service.UserService = service.NewUserService(ur)
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
-	var u dto.User
-	json.NewDecoder(r.Body).Decode(&u)
-	ur, err := us.CreateUser(u)
+func Recovery() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				switch err.(type) {
+				case *errUs.AuthError:
+					error := err.(*errUs.AuthError)
+					c.JSON(error.Code(), gin.H{"error": error.Error()})
+				case *errUs.NotFoundError:
+					error := err.(*errUs.NotFoundError)
+					c.JSON(error.Code(), gin.H{"error": error.Error()})
+				case *errUs.BadRequestError:
+					error := err.(*errUs.BadRequestError)
+					c.JSON(error.Code(), gin.H{"error": error.Error()})
+				case *errUs.GenericError:
+					error := err.(*errUs.GenericError)
+					c.JSON(error.Code(), gin.H{"error": error.Error()})
+				}
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.(error).Error()})
+			}
+		}()
+		c.Next()
+	}
+}
+
+func CreateUser(c *gin.Context) {
+	var req dto.User
+	if err := c.ShouldBindJSON(&req); err != nil {
+		panic(errUs.NewBadRequestError("Error to parse body."))
+	}
+	resp, err := us.CreateUser(req)
 	if err != nil {
-		HandleError(err, w)
+		panic(err)
 	} else {
-		json.NewEncoder(w).Encode(&ur)
+		c.JSON(http.StatusCreated, &resp)
 	}
 }
 
-func UpdateUser(w http.ResponseWriter, r *http.Request) {
-	var u dto.UserUpdate
-	json.NewDecoder(r.Body).Decode(&u)
-	params := mux.Vars(r)
-	var uId = params["id"]
-	authorization := r.Header.Get("Authorization")
-	u.ID = uId
-	u, err := us.UpdateUser(u, authorization)
+func UpdateUser(c *gin.Context) {
+	var req dto.UserUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		panic(errUs.NewBadRequestError("Error to parse body."))
+	}
+	uId := c.Params.ByName("id")
+	authorization := c.Request.Header["Authorization"][0]
+	req.ID = uId
+	resp, err := us.UpdateUser(req, authorization)
 	if err != nil {
-		HandleError(err, w)
+		panic(err)
 	} else {
-		json.NewEncoder(w).Encode(&u)
+		c.JSON(http.StatusOK, &resp)
 	}
 }
 
-func Login(w http.ResponseWriter, r *http.Request) {
-	var l dto.LoginData
-	_ = json.NewDecoder(r.Body).Decode(&l)
-	ur, err := us.Login(l)
+func Login(c *gin.Context) {
+	var req dto.LoginData
+	if err := c.ShouldBindJSON(&req); err != nil {
+		panic(errUs.NewBadRequestError("Error to parse body."))
+	}
+	resp, err := us.Login(req)
 	if err != nil {
-		HandleError(err, w)
+		panic(err)
 	} else {
-		json.NewEncoder(w).Encode(&ur)
+		c.JSON(http.StatusOK, &resp)
 	}
 }
 
-func RecoverLogin(w http.ResponseWriter, r *http.Request) {
-	var recoverLoginData dto.RecoverLoginData
-	_ = json.NewDecoder(r.Body).Decode(&recoverLoginData)
+func RecoverLogin(c *gin.Context) {
+	var req dto.RecoverLoginData
+	if err := c.ShouldBindJSON(&req); err != nil {
+		panic(errUs.NewBadRequestError("Error to parse body."))
+	}
 
-	rl, err := us.RecoverLogin(recoverLoginData)
+	resp, err := us.RecoverLogin(req)
 	if err != nil {
-		HandleError(err, w)
+		panic(err)
 	} else {
-		json.NewEncoder(w).Encode(&rl)
-		w.WriteHeader(201)
+		c.JSON(http.StatusOK, &resp)
 	}
 }
 
-func GetUserById(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	var uId = params["id"]
-	authorization := r.Header.Get("Authorization")
-	u, err := us.GetuserById(authorization, uId)
+func GetUserById(c *gin.Context) {
+	uId := c.Params.ByName("id")
+	authorization := c.Request.Header["Authorization"][0]
+	resp, err := us.GetuserById(authorization, uId)
 	if err != nil {
-		HandleError(err, w)
+		panic(err)
 	} else {
-		json.NewEncoder(w).Encode(&u)
+		c.JSON(http.StatusOK, &resp)
 	}
-}
-
-func HandleError(err error, w http.ResponseWriter) {
-	var code int
-	switch err.(type) {
-	case *errorUR.NotFoundError:
-		code = err.(*errorUR.NotFoundError).Code()
-	case *errorUR.AuthError:
-		code = err.(*errorUR.AuthError).Code()
-	default:
-		code = http.StatusInternalServerError
-	}
-	er := dto.ErrorResponse{Code: code, Message: err.Error()}
-	// Return error response
-	NewError(w, er)
-}
-
-func NewError(w http.ResponseWriter, er dto.ErrorResponse) {
-	w.WriteHeader(er.Code)
-	json.NewEncoder(w).Encode(er)
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("X-Content-Type-Options", "nosniff")
 }
 
 func HandleRequests() {
 
-	router := mux.NewRouter()
-	router.HandleFunc("/users/login", Login).Methods("POST")
-	router.HandleFunc("/users/{id}", GetUserById).Methods("GET")
-	router.HandleFunc("/users/recover", RecoverLogin).Methods("POST")
-	router.HandleFunc("/users", CreateUser).Methods("POST")
-	router.HandleFunc("/users/{id}", UpdateUser).Methods("PUT")
+	r := gin.Default()
+	r.Use(gin.Logger())
+	r.Use(Recovery())
 
-	handler := cors.AllowAll().Handler(router)
+	r.POST("/users/login", Login)
+	r.GET("/users/{id}", GetUserById)
+	r.POST("/users/recover", RecoverLogin)
+	r.POST("/users", CreateUser)
+	r.PUT("/users/{id}", UpdateUser)
 
-	fmt.Println("Starting...")
-	log.Fatal(http.ListenAndServe(":8081", handler))
+	r.Run(":8080")
 }

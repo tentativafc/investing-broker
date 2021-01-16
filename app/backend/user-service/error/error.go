@@ -34,3 +34,14 @@ func (e *AuthError) Code() int     { return http.StatusUnauthorized }
 func NewAuthError(msg string) error {
 	return &AuthError{GenericError{msg: msg}}
 }
+
+type BadRequestError struct {
+	GenericError
+}
+
+func (e *BadRequestError) Error() string { return e.msg }
+func (e *BadRequestError) Code() int     { return http.StatusBadRequest }
+
+func NewBadRequestError(msg string) error {
+	return &BadRequestError{GenericError{msg: msg}}
+}

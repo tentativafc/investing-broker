@@ -16,7 +16,7 @@ type StsService struct {
 	ccr repo.ClientCredentialsRepository
 }
 
-func (s StsService) CreateClientCredentials(ccr dto.ClientCredentialsRequest) (*dto.ClientCredentials, error) {
+func (s StsService) GenerateClientCredentials(ccr dto.ClientCredentialsRequest) (*dto.ClientCredentials, error) {
 
 	err := ccr.Validate()
 	if err != nil {
@@ -37,7 +37,7 @@ func (s StsService) CreateClientCredentials(ccr dto.ClientCredentialsRequest) (*
 	return &dto.ClientCredentials{ClientName: cc.ClientName, ClientId: cc.ClientId, ClientSecret: cc.ClientSecret}, nil
 }
 
-func (s StsService) CreateToken(tr dto.TokenRequest) (string, error) {
+func (s StsService) GenerateToken(tr dto.TokenRequest) (string, error) {
 
 	err := tr.Validate()
 	if err != nil {

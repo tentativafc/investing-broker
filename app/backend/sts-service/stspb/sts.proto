@@ -4,8 +4,20 @@ package stspb;
 option go_package="stspb";
 
 service Sts {
+    rpc GenerateClientCredentials (GenerateClientCredentialsRequest) returns (GenerateClientCredentialsResponse) {}
     rpc GenerateToken (TokenRequest) returns (TokenResponse) {}
     rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse) {}
+    
+}
+
+message GenerateClientCredentialsRequest {
+    string client_name = 1;
+}
+
+message GenerateClientCredentialsResponse {
+    string client_name = 1;
+    string client_id = 2;
+    string client_secret = 3;
 }
 
 message TokenRequest {

@@ -45,7 +45,7 @@ func CreateRoutes(s service.StsService) {
 		if err := c.ShouldBindJSON(&req); err != nil {
 			panic(errSts.NewBadRequestError("Error to parse body."))
 		}
-		cc, err := s.CreateClientCredentials(req)
+		cc, err := s.GenerateClientCredentials(req)
 		if err != nil {
 			panic(err)
 		} else {
@@ -58,7 +58,7 @@ func CreateRoutes(s service.StsService) {
 		if err := c.ShouldBindJSON(&req); err != nil {
 			panic(errSts.NewBadRequestError("Error to parse body."))
 		}
-		token, err := s.CreateToken(req)
+		token, err := s.GenerateToken(req)
 		if err != nil {
 			panic(err)
 		} else {
