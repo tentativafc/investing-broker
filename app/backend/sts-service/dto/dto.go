@@ -4,6 +4,12 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
+type Error struct {
+	Error      string `json:"error,omitempty"`
+	Cause      string `json:"cause,omitempty"`
+	StackTrace string `json:"stacktrace,omitempty"`
+}
+
 type ClientCredentialsRequest struct {
 	ClientName string `json:"client_name,omitempty"`
 }

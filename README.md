@@ -72,6 +72,18 @@ Delete all containers:
 docker rm -f $(docker container  ls -aq)
 ```
 
+Create docker image:
+
+```sh
+docker build -t sts-service -f Dockerfile .
+```
+
+Run docker image:
+
+```sh
+docker run --rm -d --network host --name my_sts_service sts-service:latest
+```
+
 Generating GRPC stub:
 
 ```sh

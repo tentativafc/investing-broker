@@ -2,6 +2,7 @@ package repo
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/tentativafc/investing-broker/app/backend/sts-service/config"
@@ -52,6 +53,7 @@ func (ccr ClientCredentialsRepository) FindByClientName(clientName string) (*Cli
 }
 
 func NewClientCredentialsRepository() ClientCredentialsRepository {
+	fmt.Printf("Starting connection DB: %v ...", config.GetDbConfig())
 	var err error
 	db, err := gorm.Open(postgres.Open(config.GetDbConfig()), &gorm.Config{})
 	if err != nil {

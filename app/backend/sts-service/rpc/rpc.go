@@ -84,7 +84,6 @@ func StartServer(sts service.StsService) {
 	if err != nil {
 		log.Fatalf("Failed to start server, %v", err)
 	}
-
 	s := grpc.NewServer()
 	stspb.RegisterStsServer(s, &server)
 

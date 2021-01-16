@@ -20,19 +20,19 @@ func (s StsService) GenerateClientCredentials(ccr dto.ClientCredentialsRequest) 
 
 	err := ccr.Validate()
 	if err != nil {
-		return nil, errorSts.NewBadRequestError(err.Error())
+		return nil, errorSts.NewBadRequestError("Error to validate request", err)
 	}
 	cc, err := repo.NewClientCredentialsRepository().FindByClientName(ccr.ClientName)
 	if err != nil {
-		return nil, errorSts.NewGenericError("Error to find client credentials by Client Name.")
+		return nil, errorSts.NewGenericError("Error to find client credentials by Client Name.", err)
 	}
 	if cc != nil {
-		return nil, errorSts.NewBadRequestError("Client credentials already exists with this Client Name.")
+		return nil, errorSts.NewBadRequestError("Client credentials already exists with this Client Name.", nil)
 	}
 	cc = &repo.ClientCredentials{ClientName: ccr.ClientName, ClientId: uuid.New().String(), ClientSecret: uuid.New().String(), CreatedAt: time.Now()}
 	_, err = s.ccr.CreateClientCredentials(cc)
 	if err != nil {
-		return nil, errorSts.NewGenericError("Error to create client credentials.")
+		return nil, errorSts.NewGenericError("Error to create client credentials.", err)
 	}
 	return &dto.ClientCredentials{ClientName: cc.ClientName, ClientId: cc.ClientId, ClientSecret: cc.ClientSecret}, nil
 }
@@ -41,15 +41,15 @@ func (s StsService) GenerateToken(tr dto.TokenRequest) (string, error) {
 
 	err := tr.Validate()
 	if err != nil {
-		return "", errorSts.NewBadRequestError(err.Error())
+		return "", errorSts.NewBadRequestError(err.Error(), err)
 	}
 
 	cr, err := s.ccr.FindByClientId(tr.ClientId)
 	if cr == nil || err != nil {
-		return "", errorSts.NewGenericError("Error to find client credentials.")
+		return "", errorSts.NewGenericError("Error to find client credentials.", err)
 	}
 	if cr.ClientSecret != tr.ClientSecret {
-		return "", errorSts.NewBadRequestError("Invalid credentials.")
+		return "", errorSts.NewBadRequestError("Invalid credentials.", nil)
 	}
 	atClaims := jwt.MapClaims{}
 	atClaims["authorized"] = true
@@ -60,7 +60,7 @@ func (s StsService) GenerateToken(tr dto.TokenRequest) (string, error) {
 	at.Header["client_id"] = cr.ClientId
 	token, err := at.SignedString([]byte(cr.ClientSecret))
 	if err != nil {
-		return "", errorSts.NewGenericError("Error to generate token.")
+		return "", errorSts.NewGenericError("Error to generate token.", err)
 	}
 
 	return token, nil
@@ -70,7 +70,7 @@ func (s StsService) ValidateToken(req dto.ValidateTokenRequest) (*dto.ValidateTo
 
 	err := req.Validate()
 	if err != nil {
-		return nil, errorSts.NewBadRequestError(err.Error())
+		return nil, errorSts.NewBadRequestError(err.Error(), err)
 	}
 
 	// Parse takes the token string and a function for looking up the key. The latter is especially
@@ -80,14 +80,16 @@ func (s StsService) ValidateToken(req dto.ValidateTokenRequest) (*dto.ValidateTo
 	token, err := jwt.Parse(req.Token, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, errorSts.NewGenericError(fmt.Sprint("Unexpected signing method: %v", token.Header["alg"]))
+			return nil, errorSts.NewGenericError(fmt.Sprint("Unexpected signing method: %v", token.Header["alg"]), nil)
 		}
 
-		clientId := token.Header["client_id"].(string)
+		if _, ok := token.Header["client_id"]; !ok {
+			return nil, errorSts.NewGenericError("Invalid token.", nil)
+		}
 
-		cr, err := s.ccr.FindByClientId(clientId)
+		cr, err := s.ccr.FindByClientId(token.Header["client_id"].(string))
 		if err != nil {
-			return cr, errorSts.NewGenericError("Error to find client credentials.")
+			return cr, errorSts.NewGenericError("Error to find client credentials.", err)
 		}
 
 		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
