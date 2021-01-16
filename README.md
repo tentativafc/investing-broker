@@ -65,9 +65,19 @@ Postman collection of project: investing.postman_collection.json
 
 ### Commands:
 
+Delete all containers:
+
 ```sh
 docker rm -f $(docker container  ls -aq)
 ```
+
+Generating GRPC stub:
+
+```sh
+protoc sts.proto --go_out=plugins=grpc:.
+```
+
+Start cluster K8s:
 
 ```sh
 minikube start
