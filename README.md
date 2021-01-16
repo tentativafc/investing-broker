@@ -12,6 +12,7 @@ docker-compose up
 | Service                 | Port Number | Type/Tech   |
 | ----------------------- | ----------- | ----------- |
 | Postgres                | 5432        | DB          |
+| Postgres STS            | 5433        | DB          |
 | Mongo-IbovespaAssets    | 27017       | DB          |
 | Mongo-Currency          | 27018       | DB          |
 | Mongo-Selic             | 27019       | DB          |
