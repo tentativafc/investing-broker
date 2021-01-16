@@ -35,7 +35,7 @@ func (ccr ClientCredentialsRepository) CreateClientCredentials(cr *ClientCredent
 
 func (ccr ClientCredentialsRepository) FindByClientId(clientId string) (*ClientCredentials, error) {
 	var cr ClientCredentials
-	err := ccr.db.Where("client_id = ?", clientId).First(cr).Error
+	err := ccr.db.Where("client_id = ?", clientId).First(&cr).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil
 	}

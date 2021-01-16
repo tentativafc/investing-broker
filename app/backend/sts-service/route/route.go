@@ -27,6 +27,7 @@ func Recovery() gin.HandlerFunc {
 					error := err.(*errSts.GenericError)
 					c.JSON(error.Code(), gin.H{"error": error.Error()})
 				}
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.(error).Error()})
 			}
 		}()
 		c.Next()
@@ -49,6 +50,32 @@ func CreateRoutes(s service.StsService) {
 			panic(err)
 		} else {
 			c.JSON(http.StatusOK, cc)
+		}
+	})
+
+	r.POST("/token", func(c *gin.Context) {
+		var req dto.TokenRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			panic(errSts.NewBadRequestError("Error to parse body."))
+		}
+		token, err := s.CreateToken(req)
+		if err != nil {
+			panic(err)
+		} else {
+			c.JSON(http.StatusOK, dto.TokenResponse{Token: token})
+		}
+	})
+
+	r.POST("/validate_token", func(c *gin.Context) {
+		var req dto.ValidateTokenRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			panic(errSts.NewBadRequestError("Error to parse body."))
+		}
+		resp, err := s.ValidateToken(req)
+		if err != nil {
+			panic(err)
+		} else {
+			c.JSON(http.StatusOK, resp)
 		}
 	})
 

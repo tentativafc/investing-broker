@@ -7,10 +7,8 @@ import (
 )
 
 func main() {
-
 	s := service.NewStsService()
 
 	go rpc.StartServer(s)
 	route.CreateRoutes(s)
-
 }
