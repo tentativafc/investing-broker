@@ -19,3 +19,13 @@ func GetDbConfigSts() string {
 	}
 	return dbConection
 }
+
+func GetGrpcStsServer() string {
+
+	var stsConnection = os.Getenv("grpc_sts")
+	if len(stsConnection) == 0 {
+		stsConnection = "localhost:50051"
+	}
+	return stsConnection
+
+}

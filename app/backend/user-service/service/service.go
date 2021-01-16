@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -10,11 +9,13 @@ import (
 
 	"strings"
 
+	"github.com/tentativafc/investing-broker/app/backend/sts-service/util"
+	"github.com/tentativafc/investing-broker/app/backend/user-service/config"
 	"github.com/tentativafc/investing-broker/app/backend/user-service/dto"
 	errorUR "github.com/tentativafc/investing-broker/app/backend/user-service/error"
 	"github.com/tentativafc/investing-broker/app/backend/user-service/repo"
 	"github.com/tentativafc/investing-broker/app/backend/user-service/stspb"
-	"github.com/tentativafc/investing-broker/app/backend/user-service/util"
+
 	"google.golang.org/grpc"
 )
 
@@ -25,10 +26,10 @@ type UserService struct {
 
 func NewUserService(ur repo.UserRepository) UserService {
 
-	cc, err := grpc.Dial("sts-service:50051", grpc.WithInsecure())
+	cc, err := grpc.Dial(config.GetGrpcStsServer(), grpc.WithInsecure())
 
 	if err != nil {
-		log.Fatal("Could not connect: %v", err)
+		log.Fatal("Could not connect to sts server: %v", err)
 	}
 
 	// defer cc.Close()
@@ -40,119 +41,122 @@ func NewUserService(ur repo.UserRepository) UserService {
 	return us
 }
 
-func (us UserService) CreateUser(u dto.User) (dto.UserResponse, error) {
+func (us UserService) CreateUser(u dto.User) (*dto.UserResponse, error) {
 	u.ID = uuid.New().String()
 	userDb := repo.UserDB{ID: u.ID, Firstname: u.Firstname, Lastname: u.Lastname, Email: u.Email, Password: u.Password, CreatedAt: time.Now()}
 	_, err := us.ur.CreateUser(userDb)
-	var ur dto.UserResponse
 	if err != nil {
-		return ur, errorUR.NewGenericError(err.Error())
+		return nil, errorUR.NewGenericError(err.Error())
 
 	}
 
-	tr, err := us.sc.GenerateToken(context.Background(), &stspb.TokenRequest{ClientId: userDb.ID})
+	cc, err := us.sc.GenerateClientCredentials(context.Background(), &stspb.GenerateClientCredentialsRequest{ClientName: u.Email})
 	if err != nil {
-		return ur, errorUR.NewAuthError("Error to generating jwt")
+		panic(err)
 	}
-	ur = dto.UserResponse{Token: tr.Token, ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email}
-	return ur, nil
+
+	tr, err := us.sc.GenerateToken(context.Background(), &stspb.TokenRequest{ClientId: cc.ClientId, ClientSecret: cc.ClientSecret})
+	if err != nil {
+		return nil, errorUR.NewAuthError("Error to generating jwt")
+	}
+	return &dto.UserResponse{Token: tr.Token, ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email}, nil
 }
 
-func (us UserService) UpdateUser(u dto.UserUpdate, authorization string) (dto.UserUpdate, error) {
+func (us UserService) UpdateUser(u dto.UserUpdate, authorization string) (*dto.UserUpdate, error) {
 
 	if !strings.HasPrefix(authorization, "Bearer ") {
 		err := errorUR.NewAuthError("Token not found")
-		return dto.UserUpdate{}, err
+		return nil, err
 	}
 
 	token := util.GetSubstringAfter(authorization, "Bearer ")
 
-	userIdJwt, err := util.GetUserIdFromToken(token)
+	vtr, err := us.sc.ValidateToken(context.Background(), &stspb.ValidateTokenRequest{Token: token})
 
 	if err != nil {
 		err = errorUR.NewAuthError("Token expired or invalid")
-		return dto.UserUpdate{}, err
+		return nil, err
 	}
 
-	if u.ID != userIdJwt {
+	if u.Email != vtr.ClientName {
 		err = errorUR.NewAuthError("Invalid credentials")
-		return dto.UserUpdate{}, err
+		return nil, err
 	}
 
 	userDb := repo.UserDB{ID: u.ID, Firstname: u.Firstname, Lastname: u.Lastname, Email: u.Email, UpdatedAt: time.Now()}
 	_, err = us.ur.UpdateUser(userDb)
 	if err != nil {
-		return dto.UserUpdate{}, errorUR.NewGenericError(err.Error())
+		return nil, errorUR.NewGenericError(err.Error())
 
 	}
-	return u, nil
+	return &u, nil
 }
 
-func (us UserService) Login(l dto.LoginData) (dto.UserResponse, error) {
+func (us UserService) Login(l dto.LoginData) (*dto.UserResponse, error) {
 
-	var ur dto.UserResponse
 	err := l.Validate()
 	if err != nil {
-		return ur, err
+		return nil, err
 	}
 
 	userDb, err := us.ur.FindByEmail(l.Email)
 	if err != nil {
-		return ur, errorUR.NewNotFoundError("User not found")
+		return nil, errorUR.NewNotFoundError("User not found")
 	}
-	tr, err := us.sc.GenerateToken(context.Background(), &stspb.TokenRequest{ClientId: userDb.ID})
+
+	ccr, err := us.ur.FindClientCredentialsByClientName(l.Email)
+	if ccr == nil || err != nil {
+		return nil, errorUR.NewBadRequestError("Error to find client credentials.")
+	}
+
+	tr, err := us.sc.GenerateToken(context.Background(), &stspb.TokenRequest{ClientId: ccr.ClientId, ClientSecret: ccr.ClientSecret})
 	if err != nil {
-		fmt.Println("Error %v", err)
-		return ur, errorUR.NewAuthError("Error to generating jwt")
+		return nil, errorUR.NewAuthError("Error to generating jwt")
 	}
-	ur = dto.UserResponse{Token: tr.Token, ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email}
-	return ur, nil
+	return &dto.UserResponse{Token: tr.Token, ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email}, nil
 }
 
-func (us UserService) RecoverLogin(recover dto.RecoverLoginData) (dto.RecoverLoginDataResponse, error) {
-	var rl dto.RecoverLoginDataResponse
+func (us UserService) RecoverLogin(recover dto.RecoverLoginData) (*dto.RecoverLoginDataResponse, error) {
 	userDb, err := us.ur.FindByEmail(recover.Email)
 	if err != nil {
-		return rl, errorUR.NewNotFoundError("User not found")
+		return nil, errorUR.NewNotFoundError("User not found")
 	}
 
 	tempPassword := uuid.New().String()
 	r, err := us.ur.CreateRecoverPassword(userDb, uuid.New(), tempPassword)
 	if err != nil {
-		err = errorUR.NewAuthError("Error creating recover password")
-		return dto.RecoverLoginDataResponse{}, err
+		return nil, errorUR.NewAuthError("Error creating recovery password")
 	}
-	rl = dto.RecoverLoginDataResponse{ID: r.ID, Email: userDb.Email}
-	return rl, nil
+	return &dto.RecoverLoginDataResponse{ID: r.ID, Email: userDb.Email}, nil
+
 }
 
-func (us UserService) GetuserById(authorization string, userId string) (dto.UserResponse, error) {
+func (us UserService) GetuserById(authorization string, userId string) (*dto.UserResponse, error) {
 
 	if !strings.HasPrefix(authorization, "Bearer ") {
 		err := errorUR.NewAuthError("Token not found")
-		return dto.UserResponse{}, err
+		return nil, err
 	}
 
 	token := util.GetSubstringAfter(authorization, "Bearer ")
 
-	userIdJwt, err := util.GetUserIdFromToken(token)
+	vtr, err := us.sc.ValidateToken(context.Background(), &stspb.ValidateTokenRequest{Token: token})
 
 	if err != nil {
 		err = errorUR.NewAuthError("Token expired or invalid")
-		return dto.UserResponse{}, err
-	}
-
-	if userId != userIdJwt {
-		err = errorUR.NewAuthError("Invalid credentials")
-		return dto.UserResponse{}, err
-
+		return nil, err
 	}
 
 	userDb, err := us.ur.FindById(userId)
 	if err != nil {
 		err = errorUR.NewNotFoundError("User not found")
-		return dto.UserResponse{}, err
+		return nil, err
 	}
 
-	return dto.UserResponse{ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email, Token: token}, nil
+	if userDb.Email != vtr.ClientName {
+		err = errorUR.NewAuthError("Invalid credentials")
+		return nil, err
+	}
+
+	return &dto.UserResponse{ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email, Token: token}, nil
 }

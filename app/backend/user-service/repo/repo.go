@@ -87,7 +87,7 @@ func (ur UserRepository) CreateRecoverPassword(u UserDB, id uuid.UUID, tempPassw
 
 func (ccr UserRepository) FindClientCredentialsByClientName(clientName string) (*ClientCredentials, error) {
 	var cr ClientCredentials
-	err := ccr.db.Where("client_name = ?", clientName).First(&cr).Error
+	err := ccr.dbSts.Where("client_name = ?", clientName).First(&cr).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil
 	}
