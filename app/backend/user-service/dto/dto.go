@@ -5,6 +5,12 @@ import (
 	"github.com/go-ozzo/ozzo-validation/is"
 )
 
+type Error struct {
+	Message    string `json:"message,omitempty"`
+	Cause      string `json:"cause,omitempty"`
+	StackTrace string `json:"stacktrace,omitempty"`
+}
+
 type User struct {
 	ID        string `json:"id,omitempty"`
 	Firstname string `json:"firstname,omitempty"`

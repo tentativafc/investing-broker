@@ -2,21 +2,15 @@ package service
 
 import (
 	"context"
-	"log"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
-
-	"strings"
-
 	"github.com/tentativafc/investing-broker/app/backend/sts-service/util"
-	"github.com/tentativafc/investing-broker/app/backend/user-service/config"
 	"github.com/tentativafc/investing-broker/app/backend/user-service/dto"
 	errorUR "github.com/tentativafc/investing-broker/app/backend/user-service/error"
 	"github.com/tentativafc/investing-broker/app/backend/user-service/repo"
 	"github.com/tentativafc/investing-broker/app/backend/user-service/stspb"
-
-	"google.golang.org/grpc"
 )
 
 type UserService struct {
@@ -24,40 +18,22 @@ type UserService struct {
 	sc stspb.StsClient
 }
 
-func NewUserService(ur repo.UserRepository) UserService {
-
-	cc, err := grpc.Dial(config.GetGrpcStsServer(), grpc.WithInsecure())
-
-	if err != nil {
-		log.Fatal("Could not connect to sts server: %v", err)
-	}
-
-	// defer cc.Close()
-
-	c := stspb.NewStsClient(cc)
-
-	us := UserService{ur: ur, sc: c}
-
-	return us
-}
-
 func (us UserService) CreateUser(u dto.User) (*dto.UserResponse, error) {
 	u.ID = uuid.New().String()
-	userDb := repo.UserDB{ID: u.ID, Firstname: u.Firstname, Lastname: u.Lastname, Email: u.Email, Password: u.Password, CreatedAt: time.Now()}
+	userDb := repo.User{ID: u.ID, Firstname: u.Firstname, Lastname: u.Lastname, Email: u.Email, Password: u.Password, CreatedAt: time.Now()}
 	_, err := us.ur.CreateUser(userDb)
 	if err != nil {
-		return nil, errorUR.NewGenericError(err.Error())
+		return nil, errorUR.NewGenericError(err.Error(), err)
 
 	}
-
 	cc, err := us.sc.GenerateClientCredentials(context.Background(), &stspb.GenerateClientCredentialsRequest{ClientName: u.Email})
 	if err != nil {
-		panic(err)
+		return nil, errorUR.NewGenericError("Error to generating client credentials", err)
 	}
 
 	tr, err := us.sc.GenerateToken(context.Background(), &stspb.TokenRequest{ClientId: cc.ClientId, ClientSecret: cc.ClientSecret})
 	if err != nil {
-		return nil, errorUR.NewAuthError("Error to generating jwt")
+		return nil, errorUR.NewAuthError("Error to generating jwt", err)
 	}
 	return &dto.UserResponse{Token: tr.Token, ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email}, nil
 }
@@ -65,7 +41,7 @@ func (us UserService) CreateUser(u dto.User) (*dto.UserResponse, error) {
 func (us UserService) UpdateUser(u dto.UserUpdate, authorization string) (*dto.UserUpdate, error) {
 
 	if !strings.HasPrefix(authorization, "Bearer ") {
-		err := errorUR.NewAuthError("Token not found")
+		err := errorUR.NewAuthError("Token not found", nil)
 		return nil, err
 	}
 
@@ -74,19 +50,19 @@ func (us UserService) UpdateUser(u dto.UserUpdate, authorization string) (*dto.U
 	vtr, err := us.sc.ValidateToken(context.Background(), &stspb.ValidateTokenRequest{Token: token})
 
 	if err != nil {
-		err = errorUR.NewAuthError("Token expired or invalid")
+		err = errorUR.NewAuthError("Token expired or invalid", err)
 		return nil, err
 	}
 
 	if u.Email != vtr.ClientName {
-		err = errorUR.NewAuthError("Invalid credentials")
+		err = errorUR.NewAuthError("Invalid credentials", nil)
 		return nil, err
 	}
 
-	userDb := repo.UserDB{ID: u.ID, Firstname: u.Firstname, Lastname: u.Lastname, Email: u.Email, UpdatedAt: time.Now()}
+	userDb := repo.User{ID: u.ID, Firstname: u.Firstname, Lastname: u.Lastname, Email: u.Email, UpdatedAt: time.Now()}
 	_, err = us.ur.UpdateUser(userDb)
 	if err != nil {
-		return nil, errorUR.NewGenericError(err.Error())
+		return nil, errorUR.NewGenericError(err.Error(), err)
 
 	}
 	return &u, nil
@@ -106,12 +82,12 @@ func (us UserService) Login(l dto.LoginData) (*dto.UserResponse, error) {
 
 	ccr, err := us.ur.FindClientCredentialsByClientName(l.Email)
 	if ccr == nil || err != nil {
-		return nil, errorUR.NewBadRequestError("Error to find client credentials.")
+		return nil, errorUR.NewBadRequestError("Error to find client credentials.", err)
 	}
 
 	tr, err := us.sc.GenerateToken(context.Background(), &stspb.TokenRequest{ClientId: ccr.ClientId, ClientSecret: ccr.ClientSecret})
 	if err != nil {
-		return nil, errorUR.NewAuthError("Error to generating jwt")
+		return nil, errorUR.NewAuthError("Error to generating jwt", err)
 	}
 	return &dto.UserResponse{Token: tr.Token, ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email}, nil
 }
@@ -125,7 +101,7 @@ func (us UserService) RecoverLogin(recover dto.RecoverLoginData) (*dto.RecoverLo
 	tempPassword := uuid.New().String()
 	r, err := us.ur.CreateRecoverPassword(userDb, uuid.New(), tempPassword)
 	if err != nil {
-		return nil, errorUR.NewAuthError("Error creating recovery password")
+		return nil, errorUR.NewAuthError("Error creating recovery password", err)
 	}
 	return &dto.RecoverLoginDataResponse{ID: r.ID, Email: userDb.Email}, nil
 
@@ -134,7 +110,7 @@ func (us UserService) RecoverLogin(recover dto.RecoverLoginData) (*dto.RecoverLo
 func (us UserService) GetuserById(authorization string, userId string) (*dto.UserResponse, error) {
 
 	if !strings.HasPrefix(authorization, "Bearer ") {
-		err := errorUR.NewAuthError("Token not found")
+		err := errorUR.NewAuthError("Token not found", nil)
 		return nil, err
 	}
 
@@ -143,7 +119,7 @@ func (us UserService) GetuserById(authorization string, userId string) (*dto.Use
 	vtr, err := us.sc.ValidateToken(context.Background(), &stspb.ValidateTokenRequest{Token: token})
 
 	if err != nil {
-		err = errorUR.NewAuthError("Token expired or invalid")
+		err = errorUR.NewAuthError("Token expired or invalid", err)
 		return nil, err
 	}
 
@@ -154,9 +130,14 @@ func (us UserService) GetuserById(authorization string, userId string) (*dto.Use
 	}
 
 	if userDb.Email != vtr.ClientName {
-		err = errorUR.NewAuthError("Invalid credentials")
+		err = errorUR.NewAuthError("Invalid credentials", nil)
 		return nil, err
 	}
 
 	return &dto.UserResponse{ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email, Token: token}, nil
+}
+
+func NewUserService(ur repo.UserRepository, sc stspb.StsClient) UserService {
+	us := UserService{ur: ur, sc: sc}
+	return us
 }

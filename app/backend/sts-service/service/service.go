@@ -7,9 +7,8 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 	"github.com/tentativafc/investing-broker/app/backend/sts-service/dto"
-	"github.com/tentativafc/investing-broker/app/backend/sts-service/repo"
-
 	errorSts "github.com/tentativafc/investing-broker/app/backend/sts-service/error"
+	"github.com/tentativafc/investing-broker/app/backend/sts-service/repo"
 )
 
 type StsService struct {
@@ -73,10 +72,6 @@ func (s StsService) ValidateToken(req dto.ValidateTokenRequest) (*dto.ValidateTo
 		return nil, errorSts.NewBadRequestError(err.Error(), err)
 	}
 
-	// Parse takes the token string and a function for looking up the key. The latter is especially
-	// useful if you use multiple keys for your application.  The standard is to use 'kid' in the
-	// head of the token to identify which key to use, but the parsed token (head and claims) is provided
-	// to the callback, providing flexibility.
 	token, err := jwt.Parse(req.Token, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -108,6 +103,6 @@ func (s StsService) ValidateToken(req dto.ValidateTokenRequest) (*dto.ValidateTo
 	return &vtr, err
 }
 
-func NewStsService() StsService {
-	return StsService{ccr: repo.NewClientCredentialsRepository()}
+func NewStsService(ccr repo.ClientCredentialsRepository) StsService {
+	return StsService{ccr: ccr}
 }

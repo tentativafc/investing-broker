@@ -35,7 +35,6 @@ func (s *Server) HandleError(err error) error {
 		return status.Errorf(codes.Internal, error.Error())
 	}
 	return status.Errorf(codes.Internal, err.(error).Error())
-
 }
 
 func (s *Server) GenerateClientCredentials(ctx context.Context, req *stspb.GenerateClientCredentialsRequest) (*stspb.GenerateClientCredentialsResponse, error) {
@@ -77,8 +76,8 @@ func (s *Server) ValidateToken(ctx context.Context, req *stspb.ValidateTokenRequ
 	return &stspb.ValidateTokenResponse{Token: dresp.Token, ClientId: dresp.ClientId, ClientName: dresp.ClientName}, nil
 }
 
-func StartServer(sts service.StsService) {
-	server := Server{s: sts}
+func StartServer(ss service.StsService) {
+	server := Server{s: ss}
 
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {

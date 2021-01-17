@@ -5,7 +5,7 @@ import (
 )
 
 func GetDbConfig() string {
-	var dbConection = os.Getenv("db_connection")
+	var dbConection = os.Getenv("DB_CONNECTION")
 	if len(dbConection) == 0 {
 		dbConection = "host=localhost user=postgres password=123456 dbname=postgres port=5432"
 	}
@@ -13,7 +13,7 @@ func GetDbConfig() string {
 }
 
 func GetDbConfigSts() string {
-	var dbConection = os.Getenv("db_connection_sts")
+	var dbConection = os.Getenv("DB_CONNECTION_STS")
 	if len(dbConection) == 0 {
 		dbConection = "host=localhost user=postgres password=123456 dbname=postgres port=5433"
 	}
@@ -22,10 +22,9 @@ func GetDbConfigSts() string {
 
 func GetGrpcStsServer() string {
 
-	var stsConnection = os.Getenv("grpc_sts")
-	if len(stsConnection) == 0 {
-		stsConnection = "localhost:50051"
+	var gRpcStsConnection = os.Getenv("GRPC_STS")
+	if len(gRpcStsConnection) == 0 {
+		gRpcStsConnection = "localhost:50051"
 	}
-	return stsConnection
-
+	return gRpcStsConnection
 }

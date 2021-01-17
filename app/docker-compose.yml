@@ -79,32 +79,39 @@ services:
       - ./docker/mongo-data-selic:/data/db
       - ./db-init-scripts/mongo-init-selic.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
-  # sts-service:
-  #   build: 
-  #     dockerfile: Dockerfile
-  #     context: ./backend/sts-service
-  #   ports:
-  #     - 50051:50051
-  #   networks:
-  #     - investing-network
-  #   volumes: 
-  #     - ./backend/sts-service:/app
-  #   depends_on: 
-  #     - postgres-sts
+  sts-service:
+    build: 
+      dockerfile: Dockerfile
+      context: ./backend/sts-service
+    environment:
+      - DB_CONNECTION="host=postgres-sts user=postgres password=123456 dbname=postgres port=5432"
+    ports:
+      - 8089:8080    
+      - 50051:50051
+    networks:
+      - investing-network
+    volumes: 
+      - ./backend/sts-service:/app
+    depends_on: 
+      - postgres-sts
 
-  # user-service:
-  #   build: 
-  #     dockerfile: Dockerfile
-  #     context: ./backend/user-service
-  #   ports:
-  #     - 8081:8081
-  #   networks:
-  #     - investing-network
-  #   volumes: 
-  #     - ./backend/user-service:/app
-  #   depends_on: 
-  #     - postgres
-  #     - sts-service
+  user-service:
+    build: 
+      dockerfile: Dockerfile
+      context: ./backend/user-service
+    environment:
+      - DB_CONNECTION="host=postgres user=postgres password=123456 dbname=postgres port=5432"
+      - DB_CONNECTION_STS="host=postgres-sts user=postgres password=123456 dbname=postgres port=5432"
+      - GRPC_STS="sts-service:50051"
+    ports:
+      - 8081:8081    
+    networks:
+      - investing-network
+    volumes: 
+      - ./backend/user-service:/app
+    depends_on: 
+      - postgres
+      - sts-service
 
   scraper-ibovespa-assets:
     build: 

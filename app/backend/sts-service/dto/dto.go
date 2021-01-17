@@ -5,7 +5,7 @@ import (
 )
 
 type Error struct {
-	Error      string `json:"error,omitempty"`
+	Message    string `json:"message,omitempty"`
 	Cause      string `json:"cause,omitempty"`
 	StackTrace string `json:"stacktrace,omitempty"`
 }

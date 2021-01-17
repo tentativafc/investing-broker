@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserDB struct {
+type User struct {
 	ID        string `gorm:"primarykey"`
 	Firstname string `gorm:"not null"`
 	Lastname  string `gorm:"not null"`
@@ -20,20 +20,20 @@ type UserDB struct {
 	UpdatedAt time.Time
 }
 
-func (UserDB) TableName() string {
+func (User) TableName() string {
 	return "user"
 }
 
-type RecoverLoginDB struct {
+type RecoverLogin struct {
 	ID                string `gorm:"primarykey"`
 	UserID            string
-	User              UserDB `gorm:"foreignKey:UserID"`
+	User              User   `gorm:"foreignKey:UserID"`
 	TemporaryPassword string `gorm:"not null"`
 	CreatedAt         time.Time
 	UpdatedAt         time.Time
 }
 
-func (RecoverLoginDB) TableName() string {
+func (RecoverLogin) TableName() string {
 	return "recover_password"
 }
 
@@ -50,39 +50,42 @@ type UserRepository struct {
 	dbSts *gorm.DB
 }
 
-func (ur UserRepository) CreateUser(u UserDB) (UserDB, error) {
+func (ur UserRepository) CreateUser(u User) (User, error) {
 	err := ur.db.Create(&u).Error
 	if err != nil {
-		return UserDB{}, err
+		return User{}, err
 	}
 	return u, nil
 }
 
-func (ur UserRepository) UpdateUser(u UserDB) (UserDB, error) {
+func (ur UserRepository) UpdateUser(u User) (User, error) {
 	err := ur.db.Updates(&u).Error
 	if err != nil {
-		return UserDB{}, err
+		return User{}, err
 	}
 	return u, nil
 }
 
-func (ur UserRepository) FindByEmail(email string) (UserDB, error) {
-	var userDb UserDB
-	ur.db.Where("email = ?", email).First(&userDb)
-	err := ur.db.Where("email = ?", email).First(&userDb).Error
-	return userDb, err
+func (ur UserRepository) FindByEmail(email string) (User, error) {
+	var user User
+	ur.db.Where("email = ?", email).First(&user)
+	err := ur.db.Where("email = ?", email).First(&user).Error
+	return user, err
 }
 
-func (ur UserRepository) FindById(userId string) (UserDB, error) {
-	var userDb UserDB
-	err := ur.db.First(&userDb, &userId).Error
-	return userDb, err
+func (ur UserRepository) FindById(userId string) (*User, error) {
+	var user User
+	err := ur.db.First(&user, &userId).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	return &user, err
 }
 
-func (ur UserRepository) CreateRecoverPassword(u UserDB, id uuid.UUID, tempPassword string) (RecoverLoginDB, error) {
-	recoverLoginDB := RecoverLoginDB{ID: id.String(), UserID: u.ID, User: u, TemporaryPassword: tempPassword, CreatedAt: time.Now()}
-	err := ur.db.Create(&recoverLoginDB).Error
-	return recoverLoginDB, err
+func (ur UserRepository) CreateRecoverPassword(u User, id uuid.UUID, tempPassword string) (RecoverLogin, error) {
+	recoverLogin := RecoverLogin{ID: id.String(), UserID: u.ID, User: u, TemporaryPassword: tempPassword, CreatedAt: time.Now()}
+	err := ur.db.Create(&recoverLogin).Error
+	return recoverLogin, err
 }
 
 func (ccr UserRepository) FindClientCredentialsByClientName(clientName string) (*ClientCredentials, error) {
@@ -100,8 +103,8 @@ func NewUserRepository() UserRepository {
 	if err != nil {
 		panic("Failed to connect database")
 	}
-	db.AutoMigrate(&UserDB{})
-	db.AutoMigrate(&RecoverLoginDB{})
+	db.AutoMigrate(&User{})
+	db.AutoMigrate(&RecoverLogin{})
 
 	dbSts, err := gorm.Open(postgres.Open(config.GetDbConfigSts()), &gorm.Config{})
 	if err != nil {
