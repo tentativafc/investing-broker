@@ -72,10 +72,14 @@ Delete all containers:
 docker rm -f $(docker container  ls -aq)
 ```
 
-Create docker image:
+Create docker image and push to docker-hub:
 
 ```sh
-docker build -t sts-service -f Dockerfile .
+docker build -t tentativafc/sts-service -f Dockerfile .
+```
+
+```sh
+docker push tentativafc/sts-service
 ```
 
 Run docker image:
@@ -94,4 +98,34 @@ Start cluster K8s:
 
 ```sh
 minikube start
+```
+
+Show ip of cluster:
+
+```sh
+minikube ip
+```
+
+Configure pod or service:
+
+```sh
+kubectl apply -f <filename>
+```
+
+Delete running pod or service:
+
+```sh
+kubectl delete -f <filename>
+```
+
+List pods, services or deployments:
+
+```sh
+kubectl get <pods/services/deployments>
+```
+
+Detail object:
+
+```sh
+kubectl describe <object type> <object name>
 ```

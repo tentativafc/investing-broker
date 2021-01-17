@@ -4,9 +4,8 @@ networks:
   investing-network:
     driver: bridge
 
-
 services:
-  postgres:
+  postgres-user:
     image: 'postgres:13.1-alpine'
     restart: always
     environment:
@@ -100,7 +99,7 @@ services:
       dockerfile: Dockerfile
       context: ./backend/user-service
     environment:
-      - DB_CONNECTION=host=postgres user=postgres password=123456 dbname=postgres port=5432
+      - DB_CONNECTION=host=postgres-user user=postgres password=123456 dbname=postgres port=5432
       - DB_CONNECTION_STS=host=postgres-sts user=postgres password=123456 dbname=postgres port=5432
       - GRPC_STS=sts-service:50051
     ports:
@@ -110,7 +109,7 @@ services:
     volumes: 
       - ./backend/user-service:/app
     depends_on: 
-      - postgres
+      - postgres-user
       - sts-service
 
   scraper-ibovespa-assets:
@@ -186,4 +185,4 @@ services:
       - scraper-currency
       - scraper-selic
       - frontend
-
+      

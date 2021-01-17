@@ -7,7 +7,6 @@ service Sts {
     rpc GenerateClientCredentials (GenerateClientCredentialsRequest) returns (GenerateClientCredentialsResponse) {}
     rpc GenerateToken (TokenRequest) returns (TokenResponse) {}
     rpc ValidateToken (ValidateTokenRequest) returns (ValidateTokenResponse) {}
-    
 }
 
 message GenerateClientCredentialsRequest {

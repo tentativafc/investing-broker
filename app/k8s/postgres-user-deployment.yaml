@@ -1,0 +1,70 @@
+# kind: PersistentVolume
+# apiVersion: v1
+# metadata:
+#   name: postgres-user-pv
+#   labels:
+#     type: local
+#     app: postgres-user
+# spec:
+#   storageClassName: manual
+#   capacity:
+#     storage: 5Gi
+#   accessModes:
+#     - ReadWriteMany
+#   hostPath:
+#     path: "/mnt/data/postgres-user"
+# ---
+# kind: PersistentVolumeClaim
+# apiVersion: v1
+# metadata:
+#   name: postgres-user-pv
+#   labels:
+#     app: postgres-user
+# spec:
+#   storageClassName: manual
+#   accessModes:
+#     - ReadWriteMany
+#   resources:
+#     requests:
+#       storage: 5Gi
+# ---
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: postgres-user-config
+#   labels:
+#     app: postgres-user
+# data:
+#   POSTGRES_USER: postgres
+#   POSTGRES_PASSWORD: "123456"
+# ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-user-deployment
+spec:
+  selector:
+    matchLabels:
+      app: postgres-user
+  template:
+    metadata:
+      labels:
+        app: postgres-user
+    spec:
+      volumes:
+        - name: postgres-user-vm
+          persistentVolumeClaim:
+            claimName: postgres-user-pv-claim
+      containers:
+        - name: postgres-user
+          image: postgres:13.1-alpine
+          env:
+            - name: "POSTGRES_USER"
+              value: "postgres"
+            - name: "POSTGRES_PASSWORD"
+              value: "123456"
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-user-vm
+          ports:
+            - containerPort: 5432
