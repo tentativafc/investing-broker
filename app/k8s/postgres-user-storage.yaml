@@ -17,7 +17,7 @@ spec:
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: postgres-user-pv
+  name: postgres-user-pv-claim
   labels:
     app: postgres-user
 spec:
