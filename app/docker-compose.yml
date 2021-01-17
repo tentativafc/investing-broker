@@ -84,7 +84,7 @@ services:
       dockerfile: Dockerfile
       context: ./backend/sts-service
     environment:
-      - DB_CONNECTION="host=postgres-sts user=postgres password=123456 dbname=postgres port=5432"
+      - DB_CONNECTION=host=postgres-sts user=postgres password=123456 dbname=postgres port=5432
     ports:
       - 8089:8080    
       - 50051:50051
@@ -100,9 +100,9 @@ services:
       dockerfile: Dockerfile
       context: ./backend/user-service
     environment:
-      - DB_CONNECTION="host=postgres user=postgres password=123456 dbname=postgres port=5432"
-      - DB_CONNECTION_STS="host=postgres-sts user=postgres password=123456 dbname=postgres port=5432"
-      - GRPC_STS="sts-service:50051"
+      - DB_CONNECTION=host=postgres user=postgres password=123456 dbname=postgres port=5432
+      - DB_CONNECTION_STS=host=postgres-sts user=postgres password=123456 dbname=postgres port=5432
+      - GRPC_STS=sts-service:50051
     ports:
       - 8081:8081    
     networks:
@@ -152,36 +152,38 @@ services:
     depends_on: 
       - mongo-ibovespa-assets
 
-  # frontend:
-  #   restart: always
-  #   build: 
-  #     dockerfile: Dockerfile
-  #     context: ./frontend/app
-  #   ports:
-  #     - '8080:8080'
-  #   networks:
-  #     - investing-network
-  #   volumes: 
-  #     - /app/node_modules
-  #     - ./frontend/app:/app
-  #   depends_on: 
-  #     - user-service
+  frontend:
+    restart: always
+    build: 
+      dockerfile: Dockerfile
+      context: ./frontend/app
+    environment:
+      - VUE_APP_API_URL=http://localhost:80/api/
+    ports:
+      - '8080:8080'
+    networks:
+      - investing-network
+    volumes: 
+      - /app/node_modules
+      - ./frontend/app:/app
+    depends_on: 
+      - user-service
 
-  # nginx:
-  #   image: nginx:1.19.6
-  #   restart: always    
-  #   ports: 
-  #     - 80:80
-  #     - 443:443
-  #   networks:
-  #     - investing-network
-  #   volumes:
-  #     - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-  #   depends_on:
-  #     - sts-service
-  #     - user-service
-  #     - scraper-ibovespa-assets
-  #     - scraper-currency
-  #     - scraper-selic
-  #     - frontend
+  nginx:
+    image: nginx:1.19.6
+    restart: always    
+    ports: 
+      - 80:80
+      - 443:443
+    networks:
+      - investing-network
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - sts-service
+      - user-service
+      - scraper-ibovespa-assets
+      - scraper-currency
+      - scraper-selic
+      - frontend
 
