@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sts-service-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sts-service
+  template:
+    metadata:
+      labels:
+        app: sts-service
+    spec:
+      containers:
+        - name: sts-service
+          image: tentativafc/ib-sts-service:1.0-snapshot
+          # imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+            - containerPort: 50051
+          env:
+            - name: "DB_CONNECTION"
+              value: "host=postgres-sts-cluster-ip-service user=postgres password=123456 dbname=postgres port=5432"

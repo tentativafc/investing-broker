@@ -2,6 +2,8 @@
 
 Provides a complete tool to control personal investments.
 
+### Starting using docker-compose
+
 ```sh
 cd ./app
 docker-compose up
@@ -25,9 +27,16 @@ docker-compose up
 | Frontend                | 8080        | Vue         |
 | Nginx                   | 80          | HTTP Server |
 
+### Starting using K8S
+
+```sh
+cd ./app
+kubectl apply -f k8s/
+```
+
 Postman collection of project: investing.postman_collection.json
 
-## Analytics
+## Analytics99
 
 ### Environment
 
@@ -64,6 +73,11 @@ Postman collection of project: investing.postman_collection.json
 
 - [TAlib Python](https://technical-analysis-library-in-python.readthedocs.io/en/latest/ta.html#trend-indicators)
 
+### K8s
+
+- Storage classes:
+  https://kubernetes.io/docs/concepts/storage/storage-classes/
+
 ### Commands:
 
 Delete all containers:
@@ -75,11 +89,11 @@ docker rm -f $(docker container  ls -aq)
 Create docker image and push to docker-hub:
 
 ```sh
-docker build -t tentativafc/sts-service -f Dockerfile .
+docker build -t tentativafc/ib-sts-service:1.0-snapshot -f Dockerfile .
 ```
 
 ```sh
-docker push tentativafc/sts-service
+docker push tentativafc/ib-sts-service:1.0-snapshot
 ```
 
 Run docker image:
@@ -128,4 +142,19 @@ Detail object:
 
 ```sh
 kubectl describe <object type> <object name>
+```
+
+```sh
+kubectl describe services postgres-user-service
+```
+
+Create and list secrets:
+
+```sh
+kubectl create secret <type of secret> <secret name> --from literal key=value
+kubectl get secrets
+```
+
+```sh
+minikube start --mount-string="/opt/apl/investing-broker/kubernetes-volume:/data"
 ```

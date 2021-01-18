@@ -1,10 +1,10 @@
 kind: PersistentVolume
 apiVersion: v1
 metadata:
-  name: postgres-user-pv
+  name: postgres-sts-pv
   labels:
     type: local
-    app: postgres-user
+    app: postgres-sts
 spec:
   storageClassName: manual
   capacity:
@@ -12,14 +12,14 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /data/postgres-user/
+    path: /data/postgres-sts/
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: postgres-user-pv-claim
+  name: postgres-sts-pv-claim
   labels:
-    app: postgres-user
+    app: postgres-sts
 spec:
   storageClassName: manual
   accessModes:

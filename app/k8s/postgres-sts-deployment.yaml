@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres-user-deployment
+  name: postgres-sts-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: postgres-user
+      app: postgres-sts
   template:
     metadata:
       labels:
-        app: postgres-user
+        app: postgres-sts
     spec:
       containers:
-        - name: postgres-user
+        - name: postgres-sts
           image: postgres:13.1-alpine
           ports:
             - containerPort: 5432
@@ -23,9 +23,9 @@ spec:
             - name: "POSTGRES_PASSWORD"
               value: "123456"
           volumeMounts:
-            - name: postgres-user-vm
+            - name: postgres-sts-vm
               mountPath: /var/lib/postgresql/data
       volumes:
-        - name: postgres-user-vm
+        - name: postgres-sts-vm
           persistentVolumeClaim:
-            claimName: postgres-user-pv-claim
+            claimName: postgres-sts-pv-claim

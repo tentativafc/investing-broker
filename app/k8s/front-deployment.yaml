@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: tentativafc/ib-frontend:1.0-snapshot
+          # imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: "VUE_APP_API_URL"
+              value: "http://localhost:80/api/"
