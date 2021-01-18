@@ -2,7 +2,7 @@
 
 Provides a complete tool to control personal investments.
 
-### Starting using docker-compose
+### Starting docker-compose Environment
 
 ```sh
 cd ./app
@@ -27,7 +27,21 @@ docker-compose up
 | Frontend                | 8080        | Vue         |
 | Nginx                   | 80          | HTTP Server |
 
-### Starting using K8S
+### Starting K8S Environment
+
+Start minikube:
+
+```sh
+minikube start
+```
+
+Enable ingress:
+
+```sh
+minikube addons enable ingress
+```
+
+Start all objects:
 
 ```sh
 cd ./app
@@ -157,4 +171,10 @@ kubectl get secrets
 
 ```sh
 minikube start --mount-string="/opt/apl/investing-broker/kubernetes-volume:/data"
+```
+
+Dashboard:
+
+```sh
+minikube dashboard
 ```

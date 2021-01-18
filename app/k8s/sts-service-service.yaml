@@ -5,7 +5,7 @@ metadata:
   labels:
     app: sts-service
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: sts-service
   ports:
