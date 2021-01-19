@@ -15,9 +15,8 @@ spec:
       containers:
         - name: frontend
           image: tentativafc/ib-frontend:1.0-snapshot
-          # imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:
             - name: "VUE_APP_API_URL"
-              value: "http://localhost:80/api/"
+              value: "http://investing-broker/api/"

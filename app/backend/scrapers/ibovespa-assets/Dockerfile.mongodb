@@ -1,0 +1,2 @@
+FROM mongo:4.4.2
+COPY ./mongo-init-ibovespa-assets.js /docker-entrypoint-initdb.d/mongo-init.js

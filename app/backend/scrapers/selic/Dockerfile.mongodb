@@ -1,0 +1,2 @@
+FROM mongo:4.4.2
+COPY ./mongo-init-selic.js /docker-entrypoint-initdb.d/mongo-init.js

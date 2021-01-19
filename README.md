@@ -178,3 +178,9 @@ Dashboard:
 ```sh
 minikube dashboard
 ```
+
+Show url of service:
+
+```sh
+minikube service <service name> --url
+```
