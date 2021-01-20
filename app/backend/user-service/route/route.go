@@ -48,7 +48,11 @@ func UpdateUser(c *gin.Context) {
 		panic(errUs.NewBadRequestError("Error to parse body.", err))
 	}
 	uId := c.Params.ByName("id")
+	if _, ok := c.Request.Header["Authorization"]; !ok {
+		panic(errUs.NewAuthError("Authorization header not found.", nil))
+	}
 	authorization := c.Request.Header["Authorization"][0]
+
 	req.ID = uId
 	resp, err := gus.UpdateUser(req, authorization)
 	if err != nil {
@@ -87,6 +91,10 @@ func RecoverLogin(c *gin.Context) {
 
 func GetUserById(c *gin.Context) {
 	uId := c.Params.ByName("id")
+
+	if _, ok := c.Request.Header["Authorization"]; !ok {
+		panic(errUs.NewAuthError("Authorization header not found.", nil))
+	}
 	authorization := c.Request.Header["Authorization"][0]
 	resp, err := gus.GetuserById(authorization, uId)
 	if err != nil {
@@ -104,10 +112,10 @@ func CreateRoutes(us service.UserService) {
 	r.Use(Recovery())
 
 	r.POST("/api/users/login", Login)
-	r.GET("/api/users/{id}", GetUserById)
+	r.GET("/api/users/:id", GetUserById)
 	r.POST("/api/users/recover", RecoverLogin)
 	r.POST("/api/users", CreateUser)
-	r.PUT("/api/users/{id}", UpdateUser)
+	r.PUT("/api/users/:id", UpdateUser)
 
 	r.Run(":8081")
 }
