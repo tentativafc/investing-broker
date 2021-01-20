@@ -76,6 +76,21 @@ services:
     volumes:
       - ./docker/mongo-data-selic:/data/db
 
+  mongo-b3-corporates-info:
+    build: 
+      dockerfile: Dockerfile.mongodb
+      context: ./backend/scrapers/b3-corporates-info
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongo
+      - MONGO_INITDB_ROOT_PASSWORD=123456
+      - MONGO_INITDB_DATABASE=b3-corporates-info
+    ports:
+      - 27020:27017
+    networks:
+      - investing-network
+    volumes:
+      - ./docker/mongo-data-b3-coporates-info:/data/db
+
   sts-service:
     build: 
       dockerfile: Dockerfile
