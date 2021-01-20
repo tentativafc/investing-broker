@@ -1,7 +1,7 @@
 const models = require("../models/index");
 const Scraper = require("../scrapers/index");
 
-const API_PATH = "/api/ibovespa-assets";
+const API_PATH = "/scrapers/ibovespa-assets";
 
 const get = async function (req, res, next) {
   try {

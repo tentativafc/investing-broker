@@ -15,7 +15,6 @@ spec:
       containers:
         - name: sts-service
           image: tentativafc/ib-sts-service:1.0-snapshot
-          # imagePullPolicy: Always
           ports:
             - containerPort: 8080
             - containerPort: 50051

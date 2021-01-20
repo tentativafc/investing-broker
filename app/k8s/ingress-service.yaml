@@ -24,4 +24,4 @@ spec:
               name: user-service-cluster-ip-service
               port:
                 number: 8081
-        
+                

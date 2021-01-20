@@ -43,38 +43,30 @@ type GenericError struct {
 	ErrorSt
 }
 
-func (e GenericError) Code() int { return http.StatusInternalServerError }
-
 func NewGenericError(msg string, cause error) error {
-	return &GenericError{ErrorSt{msg: msg, cause: cause, stackTrace: string(debug.Stack())}}
+	return &GenericError{ErrorSt{status: http.StatusInternalServerError, msg: msg, cause: cause, stackTrace: string(debug.Stack())}}
 }
 
 type NotFoundError struct {
 	GenericError
 }
 
-func (e NotFoundError) Code() int { return http.StatusNotFound }
-
 func NewNotFoundError(msg string) error {
-	return &NotFoundError{GenericError{ErrorSt{msg: msg, stackTrace: string(debug.Stack())}}}
+	return &NotFoundError{GenericError{ErrorSt{status: http.StatusNotFound, msg: msg, stackTrace: string(debug.Stack())}}}
 }
 
 type AuthError struct {
 	GenericError
 }
 
-func (e AuthError) Code() int { return http.StatusUnauthorized }
-
 func NewAuthError(msg string, cause error) error {
-	return &AuthError{GenericError{ErrorSt{msg: msg, cause: cause, stackTrace: string(debug.Stack())}}}
+	return &AuthError{GenericError{ErrorSt{status: http.StatusUnauthorized, msg: msg, cause: cause, stackTrace: string(debug.Stack())}}}
 }
 
 type BadRequestError struct {
 	GenericError
 }
 
-func (e BadRequestError) Code() int { return http.StatusBadRequest }
-
 func NewBadRequestError(msg string, cause error) error {
-	return &BadRequestError{GenericError{ErrorSt{msg: msg, cause: cause, stackTrace: string(debug.Stack())}}}
+	return &BadRequestError{GenericError{ErrorSt{status: http.StatusBadRequest, msg: msg, cause: cause, stackTrace: string(debug.Stack())}}}
 }

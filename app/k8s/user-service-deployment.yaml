@@ -15,7 +15,6 @@ spec:
       containers:
         - name: user-service
           image: tentativafc/ib-user-service:1.0-snapshot
-          # imagePullPolicy: Always
           ports:
             - containerPort: 8081
           env:

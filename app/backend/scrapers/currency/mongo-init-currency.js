@@ -8,5 +8,3 @@ db.createUser({
     },
   ],
 });
-
-print("######## User created");

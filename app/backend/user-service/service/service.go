@@ -77,7 +77,7 @@ func (us UserService) Login(l dto.LoginData) (*dto.UserResponse, error) {
 
 	userDb, err := us.ur.FindByEmail(l.Email)
 	if err != nil {
-		return nil, errorUR.NewNotFoundError("User not found")
+		return nil, errorUR.NewNotFoundError("User not found.")
 	}
 
 	ccr, err := us.ur.FindClientCredentialsByClientName(l.Email)
@@ -87,7 +87,7 @@ func (us UserService) Login(l dto.LoginData) (*dto.UserResponse, error) {
 
 	tr, err := us.sc.GenerateToken(context.Background(), &stspb.TokenRequest{ClientId: ccr.ClientId, ClientSecret: ccr.ClientSecret})
 	if err != nil {
-		return nil, errorUR.NewAuthError("Error to generating jwt", err)
+		return nil, errorUR.NewAuthError("Error to generating jwt.", err)
 	}
 	return &dto.UserResponse{Token: tr.Token, ID: userDb.ID, Firstname: userDb.Firstname, Lastname: userDb.Lastname, Email: userDb.Email}, nil
 }
@@ -95,7 +95,7 @@ func (us UserService) Login(l dto.LoginData) (*dto.UserResponse, error) {
 func (us UserService) RecoverLogin(recover dto.RecoverLoginData) (*dto.RecoverLoginDataResponse, error) {
 	userDb, err := us.ur.FindByEmail(recover.Email)
 	if err != nil {
-		return nil, errorUR.NewNotFoundError("User not found")
+		return nil, errorUR.NewNotFoundError("User not found.")
 	}
 
 	tempPassword := uuid.New().String()
@@ -110,7 +110,7 @@ func (us UserService) RecoverLogin(recover dto.RecoverLoginData) (*dto.RecoverLo
 func (us UserService) GetuserById(authorization string, userId string) (*dto.UserResponse, error) {
 
 	if !strings.HasPrefix(authorization, "Bearer ") {
-		err := errorUR.NewAuthError("Token not found", nil)
+		err := errorUR.NewAuthError("Token not found.", nil)
 		return nil, err
 	}
 
@@ -119,18 +119,18 @@ func (us UserService) GetuserById(authorization string, userId string) (*dto.Use
 	vtr, err := us.sc.ValidateToken(context.Background(), &stspb.ValidateTokenRequest{Token: token})
 
 	if err != nil {
-		err = errorUR.NewAuthError("Token expired or invalid", err)
+		err = errorUR.NewAuthError("Token expired or invalid.", err)
 		return nil, err
 	}
 
 	userDb, err := us.ur.FindById(userId)
 	if err != nil {
-		err = errorUR.NewNotFoundError("User not found")
+		err = errorUR.NewNotFoundError("User not found.")
 		return nil, err
 	}
 
 	if userDb.Email != vtr.ClientName {
-		err = errorUR.NewAuthError("Invalid credentials", nil)
+		err = errorUR.NewAuthError("Invalid credentials.", nil)
 		return nil, err
 	}
 

@@ -2,7 +2,7 @@ const moment = require("moment");
 const models = require("../models/index");
 const Scraper = require("../scrapers/index");
 
-const API_PATH = "/api/selic";
+const API_PATH = "/scrapers/selic";
 
 const get = async function (req, res, next) {
   try {

@@ -103,11 +103,11 @@ func CreateRoutes(us service.UserService) {
 	r.Use(gin.Logger())
 	r.Use(Recovery())
 
-	r.POST("/users/login", Login)
-	r.GET("/users/{id}", GetUserById)
-	r.POST("/users/recover", RecoverLogin)
-	r.POST("/users", CreateUser)
-	r.PUT("/users/{id}", UpdateUser)
+	r.POST("/api/users/login", Login)
+	r.GET("/api/users/{id}", GetUserById)
+	r.POST("/api/users/recover", RecoverLogin)
+	r.POST("/api/users", CreateUser)
+	r.PUT("/api/users/{id}", UpdateUser)
 
 	r.Run(":8081")
 }
