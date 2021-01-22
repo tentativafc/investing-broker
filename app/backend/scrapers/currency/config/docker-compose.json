@@ -1,0 +1,16 @@
+{
+    "Configs": {
+      "db": {
+        "host": "mongo-currency",
+        "port": "27017",
+        "user": "mongouser",
+        "password": "mongopass",
+        "database": "currency"    
+      },
+      "axios":  {
+          "timeout_in_ms": 60000
+
+      }
+    }
+  }
+}

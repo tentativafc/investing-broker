@@ -1,0 +1,14 @@
+{
+  "Configs": {
+    "db": {
+      "host": "mongodb-b3-coporates-info-ip-service",
+      "port": "27017",
+      "user": "mongouser",
+      "password": "mongopass",
+      "database": "b3-corporates-info"
+    },
+    "axios": {
+      "timeout_in_ms": 60000
+    }
+  }
+}

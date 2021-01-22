@@ -1,0 +1,14 @@
+{
+  "Configs": {
+    "db": {
+      "host": "localhost",
+      "port": "27019",
+      "user": "mongouser",
+      "password": "mongopass",
+      "database": "selic"
+    },
+    "axios": {
+      "timeout_in_ms": 60000
+    }
+  }
+}

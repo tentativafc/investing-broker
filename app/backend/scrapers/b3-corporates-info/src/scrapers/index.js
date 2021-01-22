@@ -3,6 +3,7 @@ import cheerio from "cheerio";
 import { from, of, combineLatest } from "rxjs";
 import { map, mergeMap, toArray, retry } from "rxjs/operators";
 import { CorporateInfo } from "../models";
+import { AXIOS_TIMEOUT_MS } from "../config";
 const LETTERS = [
   "A",
   "B",
@@ -31,10 +32,8 @@ const LETTERS = [
 
 const REGEX_CVM_CODE = /.*codigoCvm=(\d+)/;
 
-const TIMEOUT_DEFAULT_IN_MS = 60000;
-
 const fetchHtml = async (url) => {
-  const { data } = await axios.get(url, { timeout: TIMEOUT_DEFAULT_IN_MS });
+  const { data } = await axios.get(url, { timeout: AXIOS_TIMEOUT_MS });
   return data;
 };
 
@@ -113,9 +112,15 @@ class Scraper {
           link: url,
         };
         let filter = { cvm_code: corporate.cvm_code };
-        return CorporateInfo.updateOne(filter, {
-          $set: update_data,
-        });
+        return combineLatest(
+          of(filter),
+          CorporateInfo.updateOne(filter, {
+            $set: update_data,
+          })
+        );
+      }),
+      mergeMap(([filter, updated]) => {
+        return CorporateInfo.find(filter);
       }),
       toArray()
     );

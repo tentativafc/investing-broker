@@ -3,6 +3,7 @@ import { CurrencyPrice } from "../models";
 import moment from "moment";
 import { from } from "rxjs";
 import { filter, mergeMap, toArray, retry } from "rxjs/operators";
+import { AXIOS_TIMEOUT_MS } from "../config";
 
 const DOLAR = 61;
 const EURO = 222;
@@ -12,7 +13,7 @@ const IUAN = 178;
 const CURRENCIES = [DOLAR, EURO, IENE, IUAN];
 
 const fetchData = async (url) => {
-  const { data } = await axios.get(url);
+  const { data } = await axios.get(url, { timeout: AXIOS_TIMEOUT_MS });
   return data;
 };
 

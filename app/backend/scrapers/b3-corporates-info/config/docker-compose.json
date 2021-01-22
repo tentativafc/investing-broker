@@ -1,0 +1,14 @@
+{
+  "Configs": {
+    "db": {
+      "host": "mongo-b3-corporates-info",
+      "port": "27017",
+      "user": "mongouser",
+      "password": "mongopass",
+      "database": "b3-corporates-info"
+    },
+    "axios": {
+      "timeout_in_ms": 60000
+    }
+  }
+}

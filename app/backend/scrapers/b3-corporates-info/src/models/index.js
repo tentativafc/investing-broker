@@ -1,6 +1,5 @@
-const config = require("../config");
-const utils = require("./utils");
-const mongoose = config.mongoose;
+import { mongoose } from "../config";
+import utils from "./utils";
 
 const CorporateInfoSchema = new mongoose.Schema({
   name: { type: String, required: true },

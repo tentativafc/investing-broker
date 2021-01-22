@@ -1,0 +1,14 @@
+{
+  "Configs": {
+    "db": {
+      "host": "localhost",
+      "port": "27017",
+      "user": "mongouser",
+      "password": "mongopass",
+      "database": "ibovespa_assets"
+    },
+    "axios": {
+      "timeout_in_ms": 60000
+    }
+  }
+}

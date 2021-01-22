@@ -3,12 +3,13 @@ import cheerio from "cheerio";
 import { Asset, IbovespaAssets } from "../models/index";
 import { of } from "rxjs";
 import { mergeMap, retry } from "rxjs/operators";
+import { AXIOS_TIMEOUT_MS } from "../config";
 
 const url =
   "http://bvmf.bmfbovespa.com.br/indices/ResumoCarteiraTeorica.aspx?Indice=IBOV&idioma=pt-br";
 
 const fethHtml = async (url) => {
-  const { data } = await axios.get(url);
+  const { data } = await axios.get(url, { timeout: AXIOS_TIMEOUT_MS });
   return data;
 };
 

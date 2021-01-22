@@ -131,6 +131,8 @@ services:
       context: ./backend/scrapers/ibovespa-assets
     ports:
       - '8082:3000'
+    environment:
+      - NODE_ENV=docker-compose
     networks:
       - investing-network
     volumes:
@@ -145,6 +147,8 @@ services:
       context: ./backend/scrapers/currency
     ports:
       - '8083:3000'
+    environment:
+      - NODE_ENV=docker-compose
     networks:
       - investing-network
     volumes: 
@@ -159,6 +163,8 @@ services:
       context: ./backend/scrapers/selic
     ports:
       - '8084:3000'
+    environment:
+      - NODE_ENV=docker-compose
     networks:
       - investing-network
     volumes:
@@ -173,6 +179,8 @@ services:
       context: ./backend/scrapers/b3-corporates-info
     ports:
       - '8085:3000'
+    environment:
+      - NODE_ENV=docker-compose
     networks:
       - investing-network
     volumes:
