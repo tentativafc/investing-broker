@@ -23,10 +23,6 @@ class Scraper {
 
     return from(CURRENCIES).pipe(
       mergeMap((currency_code) => {
-        console.log("Mergemap inicial");
-        if (true) {
-          throw "Error xpto";
-        }
         const url = `https://ptax.bcb.gov.br/ptax_internet/consultaBoletim.do?method=gerarCSVFechamentoMoedaNoPeriodo&ChkMoeda=${currency_code}&DATAINI=${begin_date}&DATAFIM=${final_date}`;
         return fetchData(url);
       }),

@@ -126,20 +126,21 @@ services:
       - sts-service
 
   scraper-ibovespa-assets:
-    build: 
+    build:
       dockerfile: Dockerfile.api
       context: ./backend/scrapers/ibovespa-assets
     ports:
       - '8082:3000'
     networks:
       - investing-network
-    volumes: 
+    volumes:
+      - /app/node_modules
       - ./backend/scrapers/ibovespa-assets:/app
-    depends_on: 
+    depends_on:
       - mongo-ibovespa-assets
 
   scraper-currency:
-    build: 
+    build:
       dockerfile: Dockerfile.api
       context: ./backend/scrapers/currency
     ports:
@@ -147,22 +148,38 @@ services:
     networks:
       - investing-network
     volumes: 
+      - /app/node_modules
       - ./backend/scrapers/currency:/app
     depends_on: 
       - mongo-currency
 
   scraper-selic:
-    build: 
+    build:
       dockerfile: Dockerfile.api
       context: ./backend/scrapers/selic
     ports:
       - '8084:3000'
     networks:
       - investing-network
-    volumes: 
+    volumes:
+      - /app/node_modules
       - ./backend/scrapers/selic:/app
-    depends_on: 
+    depends_on:
       - mongo-ibovespa-assets
+
+  scraper-b3-corporates-info:
+    build:
+      dockerfile: Dockerfile.api
+      context: ./backend/scrapers/b3-corporates-info
+    ports:
+      - '8085:3000'
+    networks:
+      - investing-network
+    volumes:
+      - /app/node_modules
+      - ./backend/scrapers/b3-corporates-info:/app
+    depends_on:
+      - mongo-b3-corporates-info
 
   frontend:
     restart: always
@@ -197,5 +214,6 @@ services:
       - scraper-ibovespa-assets
       - scraper-currency
       - scraper-selic
+      - scraper-b3-corporates-info
       - frontend
       

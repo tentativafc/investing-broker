@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
-const url = "mongodb://mongouser:mongopass@localhost:27020/b3-corporates-info";
+const url =
+  "mongodb://mongouser:mongopass@mongo-b3-corporates-info:27017/b3-corporates-info";
 
 mongoose.connect(url, { useFindAndModify: false });
 

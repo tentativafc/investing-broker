@@ -30,12 +30,12 @@
   },
   "scripts": {
     "start": "node ./dist/app.js",
-    "transpile": "babel ./src --out-dir ./dist",
-    "clean": "rimraf ./dist",
-    "build": "npm-run-all clean transpile",
-    "dev": "NODE_ENV=development npm-run-all build start",
-    "prod": "NODE_ENV=production npm-run-all build start",
-    "watch:dev": "nodemon"
+    "transpile": "./node_modules/.bin/babel ./src --out-dir ./dist",
+    "clean": "./node_modules/.bin/rimraf ./dist",
+    "build": "./node_modules/.bin/npm-run-all clean transpile",
+    "dev": "NODE_ENV=development ./node_modules/.bin/npm-run-all build start",
+    "prod": "NODE_ENV=production ./node_modules/.bin/npm-run-all build start",
+    "watch:dev": "./node_modules/.bin/nodemon"
   },
   "dependencies": {
     "axios": "^0.21.1",

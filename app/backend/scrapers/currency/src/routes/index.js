@@ -32,14 +32,10 @@ const post = (req, res, next) => {
   let scraper = new Scraper();
   scraper.load().subscribe(
     (prices) => {
-      console.log("Price received");
       res.json(prices);
     },
     (err) => {
       res.send(500, { message: "Error to scrap currencies", cause: err });
-    },
-    () => {
-      console.log("Complete");
     }
   );
 };
