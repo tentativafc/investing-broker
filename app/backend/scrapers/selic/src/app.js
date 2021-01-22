@@ -1,4 +1,7 @@
-const restify = require("restify");
+import regeneratorRuntime from "regenerator-runtime";
+
+import restify from "restify";
+import morgan from "morgan";
 
 const server = restify.createServer();
 
@@ -23,6 +26,8 @@ server.use(
     mapParams: true,
   })
 );
+
+server.use(morgan("combined"));
 
 server.opts("/.*/", (req, res, next) => {
   res.send(200);

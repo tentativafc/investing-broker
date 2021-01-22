@@ -1,10 +1,10 @@
-const moment = require("moment");
-const models = require("../models/index");
-const Scraper = require("../scrapers/index");
+import moment from "moment";
+import { CurrencyPrice } from "../models";
+import Scraper from "../scrapers";
 
 const API_PATH = "/scrapers/currency";
 
-const get = async function (req, res, next) {
+const get = async (req, res, next) => {
   try {
     let symbol = req.params.symbol;
     let begin_date = req.params.begin_date
@@ -20,23 +20,28 @@ const get = async function (req, res, next) {
       });
     } else {
       let filter = { symbol, date: { $gte: begin_date, $lt: final_date } };
-      let currencyPrices = await models.CurrencyPrice.find(filter);
+      let currencyPrices = await CurrencyPrice.find(filter);
       res.json(currencyPrices);
     }
-  } catch (error) {
-    console.error(error);
-    res.send(500);
+  } catch (err) {
+    res.json({ message: "Error to get currencies prices", cause: err });
   }
 };
 
-const post = async function (req, res, next) {
-  try {
-    let scraper = new Scraper();
-    res.json(await scraper.load());
-  } catch (error) {
-    console.error(error);
-    res.send(500);
-  }
+const post = (req, res, next) => {
+  let scraper = new Scraper();
+  scraper.load().subscribe(
+    (prices) => {
+      console.log("Price received");
+      res.json(prices);
+    },
+    (err) => {
+      res.send(500, { message: "Error to scrap currencies", cause: err });
+    },
+    () => {
+      console.log("Complete");
+    }
+  );
 };
 
 function Routes(server) {

@@ -1,13 +1,15 @@
-const axios = require("axios");
-const models = require("../models/index");
-const moment = require("moment");
+import axios from "axios";
+import { CurrencyPrice } from "../models";
+import moment from "moment";
+import { from } from "rxjs";
+import { filter, mergeMap, toArray, retry } from "rxjs/operators";
 
-const CurrencyEnum = {
-  dolar: 61,
-  euro: 222,
-  iene: 101,
-  iuan: 178,
-};
+const DOLAR = 61;
+const EURO = 222;
+const IENE = 101;
+const IUAN = 178;
+
+const CURRENCIES = [DOLAR, EURO, IENE, IUAN];
 
 const fetchData = async (url) => {
   const { data } = await axios.get(url);
@@ -15,46 +17,47 @@ const fetchData = async (url) => {
 };
 
 class Scraper {
-  async load() {
-    try {
-      let begin_date = moment().subtract(1, "years").format("DD/MM/YYYY");
-      let final_date = moment().format("DD/MM/YYYY");
-      for (let currency in CurrencyEnum) {
-        const url = `https://ptax.bcb.gov.br/ptax_internet/consultaBoletim.do?method=gerarCSVFechamentoMoedaNoPeriodo&ChkMoeda=${CurrencyEnum[currency]}&DATAINI=${begin_date}&DATAFIM=${final_date}`;
-        const data_csv = await fetchData(url);
-        data_csv.split("\n").forEach(async (row) => {
-          if (!row) {
-            return;
-          }
-          let cols = row.split(";");
-          let [date, code, type, symbol, buy_value, sell_value] = cols;
+  load() {
+    let begin_date = moment().subtract(1, "years").format("DD/MM/YYYY");
+    let final_date = moment().format("DD/MM/YYYY");
 
-          date = moment(date, "DDMMYYYY").toDate();
+    return from(CURRENCIES).pipe(
+      mergeMap((currency_code) => {
+        console.log("Mergemap inicial");
+        if (true) {
+          throw "Error xpto";
+        }
+        const url = `https://ptax.bcb.gov.br/ptax_internet/consultaBoletim.do?method=gerarCSVFechamentoMoedaNoPeriodo&ChkMoeda=${currency_code}&DATAINI=${begin_date}&DATAFIM=${final_date}`;
+        return fetchData(url);
+      }),
+      //retry 2 times on erro
+      retry(2),
+      // Splits csv by row (\n)
+      mergeMap((data_csv) => {
+        return from(data_csv.split("\n")).pipe(filter((row) => row));
+      }),
+      mergeMap((row) => {
+        let cols = row.split(";");
+        let [date, code, type, symbol, buy_value, sell_value] = cols;
 
-          buy_value = buy_value.replace(/\,/g, ".");
-          buy_value = parseFloat(buy_value);
+        date = moment(date, "DDMMYYYY").toDate();
 
-          sell_value = sell_value.replace(/\,/g, ".");
-          sell_value = parseFloat(sell_value);
+        buy_value = buy_value.replace(/\,/g, ".");
+        buy_value = parseFloat(buy_value);
 
-          let filter = { date, symbol };
+        sell_value = sell_value.replace(/\,/g, ".");
+        sell_value = parseFloat(sell_value);
 
-          let data = { date, code, type, symbol, buy_value, sell_value };
-
-          try {
-            await models.CurrencyPrice.findOneAndUpdate(filter, data, {
-              new: true,
-              upsert: true,
-            });
-          } catch (error) {
-            console.log("Error when save");
-            throw error;
-          }
+        let filter = { date, symbol };
+        let data = { date, code, type, symbol, buy_value, sell_value };
+        return CurrencyPrice.findOneAndUpdate(filter, data, {
+          new: true,
+          upsert: true,
         });
-      }
-    } catch (error) {
-      throw new Error("Error to load currency prices.");
-    }
+      }),
+      toArray()
+    );
   }
 }
+
 module.exports = Scraper;

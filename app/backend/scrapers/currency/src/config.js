@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
-const url = "mongodb://mongouser:mongopass@mongo-currency:27017/currency";
+const url = "mongodb://mongouser:mongopass@localhost:27018/currency";
 
 mongoose.connect(url, { useFindAndModify: false });
 

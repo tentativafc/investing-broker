@@ -20,6 +20,8 @@ server.use(
   })
 );
 
+server.use(morgan("combined"));
+
 server.opts("/.*/", (req, res, next) => {
   res.send(200);
   return next();

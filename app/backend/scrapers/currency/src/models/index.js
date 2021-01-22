@@ -1,5 +1,5 @@
-const config = require("../config");
-const utils = require("./utils");
+import config from "../config";
+import utils from "./utils";
 const mongoose = config.mongoose;
 
 const CurrencyPriceSchema = new mongoose.Schema(

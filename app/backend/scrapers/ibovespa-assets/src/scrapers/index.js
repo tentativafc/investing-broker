@@ -1,8 +1,8 @@
 import axios from "axios";
 import cheerio from "cheerio";
 import { Asset, IbovespaAssets } from "../models/index";
-import { from, of, combineLatest, merge } from "rxjs";
-import { map, mergeMap, toArray, retry } from "rxjs/operators";
+import { of } from "rxjs";
+import { mergeMap, retry } from "rxjs/operators";
 
 const url =
   "http://bvmf.bmfbovespa.com.br/indices/ResumoCarteiraTeorica.aspx?Indice=IBOV&idioma=pt-br";

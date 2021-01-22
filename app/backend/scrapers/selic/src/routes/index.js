@@ -1,10 +1,10 @@
-const moment = require("moment");
-const models = require("../models/index");
-const Scraper = require("../scrapers/index");
+import moment from "moment";
+import { Selic } from "../models";
+import Scraper from "../scrapers";
 
 const API_PATH = "/scrapers/selic";
 
-const get = async function (req, res, next) {
+const get = async (req, res, next) => {
   try {
     let begin_date = req.params.begin_date
       ? moment(req.params.begin_date, "YYYYMMDD").toDate()
@@ -22,23 +22,26 @@ const get = async function (req, res, next) {
       if (final_date) {
         filter = { ...filter, final_date: { $lte: final_date } };
       }
-      let selicValues = await models.Selic.find(filter);
+      let selicValues = await Selic.find(filter);
       res.json(selicValues);
     }
-  } catch (error) {
-    console.error(error);
-    res.send(500);
+  } catch (err) {
+    res.send(500, { message: "Error to find selic values", cause: err });
   }
 };
 
-const post = async function (req, res, next) {
-  try {
-    let scraper = new Scraper();
-    res.json(await scraper.load());
-  } catch (error) {
-    console.error(error);
-    res.send(500);
-  }
+const post = (req, res, next) => {
+  let scraper = new Scraper();
+  scraper.load().subscribe(
+    (selic_prices) => res.json(selic_prices),
+    (err) => {
+      console.log("errorrorrroiroirori", err);
+      res.json(500, {
+        message: "Error to scrap selic prices",
+        cause: err,
+      });
+    }
+  );
 };
 
 function Routes(server) {
