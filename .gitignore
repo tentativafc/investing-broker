@@ -7,9 +7,11 @@ app/backend/docker/**
 /**/Bolsa.egg-info
 /analytics/ortisan-ta/ortisan_ta.egg-info/**
 /analytics/docker/**
+/docker/
 
 .vscode/
 
 app/docker/
 
 /**/__debug_bin
+
