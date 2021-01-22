@@ -1,4 +1,5 @@
-const restify = require("restify");
+import regeneratorRuntime from "regenerator-runtime";
+import restify from "restify";
 
 const server = restify.createServer();
 

@@ -2,11 +2,6 @@
   "name": "b3-corporates-info",
   "version": "1.0.0",
   "description": "Scraper of corporates info of B3",
-  "main": "index.js",
-  "scripts": {
-    "start": "node src/app.js",
-    "start-dev": "nodemon src/app.js"
-  },
   "repository": {
     "type": "git",
     "url": "tentativafc/investing-broker/app/backend/scrapers/b3-corporates-info"
@@ -14,6 +9,32 @@
   "keywords": [
     "scraper"
   ],
+  "main": "app.js",
+  "nodemonConfig": {
+    "exec": "npm run dev",
+    "watch": [
+      "src"
+    ],
+    "ignore": [
+      "**/__tests__/**",
+      "*.test.js",
+      "*.spec.js"
+    ]
+  },
+  "babel": {
+    "presets": [
+      "@babel/preset-env"
+    ]
+  },
+  "scripts": {
+    "start": "node ./dist/app.js",
+    "transpile": "babel ./src --out-dir ./dist",
+    "clean": "rimraf ./dist",
+    "build": "npm-run-all clean transpile",
+    "dev": "NODE_ENV=development npm-run-all build start",
+    "prod": "NODE_ENV=production npm-run-all build start",
+    "watch:dev": "nodemon"
+  },
   "author": "Marcelo Ortiz de Santana",
   "license": "ISC",
   "dependencies": {
@@ -21,6 +42,16 @@
     "cheerio": "^1.0.0-rc.5",
     "moment": "^2.29.1",
     "mongoose": "^5.11.9",
-    "restify": "^8.5.1"
+    "morgan": "^1.10.0",
+    "restify": "^8.5.1",
+    "rxjs": "^6.6.3"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.12.10",
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "nodemon": "^2.0.7",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2"
   }
 }

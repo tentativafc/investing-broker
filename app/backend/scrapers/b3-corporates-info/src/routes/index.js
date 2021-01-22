@@ -1,26 +1,28 @@
-const Scraper = require("../scrapers/index");
+import Scraper from "../scrapers/index";
 
 const API_PATH = "/scrapers/b3-corporates-info";
 
 const get = async function (req, res, next) {
-  try {
-    let corporates = await models.CorporateInfo.find({});
-    res.json(corporates);
-  } catch (error) {
-    console.error(error);
-    res.send(500);
-  }
+  models.CorporateInfo.find({})
+    .then((corporates) => {
+      res.json(corporates);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.send(500);
+    });
 };
 
 const post = async function (req, res, next) {
-  try {
-    let scraper = new Scraper();
-    let result = await scraper.load();
-    res.json(result);
-  } catch (error) {
-    console.error(error);
-    res.send(500);
-  }
+  let scraper = new Scraper();
+  scraper.load().subscribe(
+    (data) => console.log("DATAAAAA", data),
+    (err) => {
+      console.log(err);
+      res.json(err);
+    },
+    () => res.json("Complete")
+  );
 };
 
 function Routes(server) {
