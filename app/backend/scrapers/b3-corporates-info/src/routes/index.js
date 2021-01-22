@@ -16,12 +16,12 @@ const get = async function (req, res, next) {
 const post = async function (req, res, next) {
   let scraper = new Scraper();
   scraper.load().subscribe(
-    (data) => console.log("DATAAAAA", data),
+    (corporates) => res.json(corporates),
     (err) => {
       console.log(err);
       res.json(err);
-    },
-    () => res.json("Complete")
+    }
+    // () => res.json("Complete")
   );
 };
 
