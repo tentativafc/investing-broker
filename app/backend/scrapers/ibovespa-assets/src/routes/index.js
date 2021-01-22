@@ -1,11 +1,11 @@
-const models = require("../models/index");
-const Scraper = require("../scrapers/index");
+import { IbovespaAssets } from "../models/index";
+import Scraper from "../scrapers/index";
 
 const API_PATH = "/scrapers/ibovespa-assets";
 
 const get = async function (req, res, next) {
   try {
-    let ibovespaAssets = await models.IbovespaAssets.find({});
+    let ibovespaAssets = await IbovespaAssets.find({});
     res.json(ibovespaAssets);
   } catch (error) {
     console.error(error);
@@ -13,14 +13,15 @@ const get = async function (req, res, next) {
   }
 };
 
-const post = async function (req, res, next) {
-  try {
-    let scraper = new Scraper();
-    res.json(await scraper.load());
-  } catch (error) {
-    console.error(error);
-    res.send(500);
-  }
+const post = function (req, res, next) {
+  let scraper = new Scraper();
+  scraper.load().subscribe(
+    (ibovespa_assets) => res.json(ibovespa_assets),
+    (err) => {
+      res.send(500);
+      res.json(err);
+    }
+  );
 };
 
 function Routes(server) {
