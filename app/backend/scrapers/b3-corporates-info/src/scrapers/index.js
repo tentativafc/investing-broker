@@ -1,7 +1,7 @@
 import axios from "axios";
 import cheerio from "cheerio";
 import { from, of, combineLatest } from "rxjs";
-import { map, mergeMap, toArray } from "rxjs/operators";
+import { map, mergeMap, toArray, retry } from "rxjs/operators";
 import { CorporateInfo } from "../models";
 const LETTERS = [
   "A",
@@ -45,6 +45,8 @@ class Scraper {
         let url = `http://bvmf.bmfbovespa.com.br/cias-listadas/empresas-listadas/BuscaEmpresaListada.aspx?Letra=${letter}&idioma=pt-br`;
         return fetchHtml(url);
       }),
+      //retry 2 times on error
+      retry(2),
       mergeMap((html) => {
         let $ = cheerio.load(html);
         let corporates_table = $(
@@ -79,6 +81,8 @@ class Scraper {
         console.log(`Scraping corporate ${corporate.name} - ${url}`);
         return combineLatest(of(corporate), of(url), fetchHtml(url));
       }),
+      //retry 2 times on error
+      retry(2),
       mergeMap(([corporate, url, html]) => {
         let $ = cheerio.load(html);
         let table_sumary_info = $("table.ficha");
