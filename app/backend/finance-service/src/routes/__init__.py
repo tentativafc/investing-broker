@@ -29,11 +29,14 @@ class Quotes(Resource):
             abort(400, message="Invalid parameters", cause=str(errors))   
         else:
             search_filter = self.schema.load(request.args)
-            df = self.data_access.get_rates_from_symbol(search_filter['symbol'], pd.Timestamp(search_filter['init_date']), pd.Timestamp(search_filter['final_date']), mt5.TIMEFRAME_D1)
+            df = self.data_access.get_rates_from_symbol(search_filter['symbol'], pd.Timestamp(search_filter['init_date']), pd.Timestamp(search_filter['final_date']), mt5.TIMEFRAME_H1)
             # to_json() does not serialize the dataframe index
             df_with_date = df.reset_index()
-            df_with_date['Date'] = df.index
-            return df_with_date.to_json(orient='records', date_format='iso', force_ascii=False, lines=True)
+            df_with_date['Date'] = df.index.astype(str)
+            list_dict = []
+            for index, row in list(df_with_date.iterrows()):
+                list_dict.append(dict(row))
+            return list_dict
 
 
 class Portifolio(Resource):
