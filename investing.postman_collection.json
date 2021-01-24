@@ -20,13 +20,13 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8081/users",
+					"raw": "http://localhost/api/users",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
 					"path": [
+						"api",
 						"users"
 					]
 				}
@@ -41,7 +41,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2MDg5MzA4OTMsInVzZXJfaWQiOiI5ZjNhMTAyZi1iMzkzLTRkZDktODk3My1jYjE4YmUxOGVhYmEifQ.0D9qPB9w7EuJeuT-MBACkFi8X6Z2uDYhKwaBAx99Hfo",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJjbGllbnRfaWQiOiIyZGE1YjgxOS0xZDUzLTRkYmMtYjJkYy0yMDZiZDU4NjlmNmIiLCJleHAiOjE2MTAyMDQxOTN9.EW5A6npPSKV893BUlquQmriGbUnQqrpaZoO4VECzQXw",
 							"type": "string"
 						}
 					]
@@ -58,13 +58,13 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8081/users/9f3a102f-b393-4dd9-8973-cb18be18eaba",
+					"raw": "http://localhost/api/users/9f3a102f-b393-4dd9-8973-cb18be18eaba",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
 					"path": [
+						"api",
 						"users",
 						"9f3a102f-b393-4dd9-8973-cb18be18eaba"
 					]
@@ -87,13 +87,14 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8081/users/login",
+					"raw": "http://localhost:8086/api/users/login",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8081",
+					"port": "8086",
 					"path": [
+						"api",
 						"users",
 						"login"
 					]
@@ -103,6 +104,42 @@
 		},
 		{
 			"name": "GetById",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8086/api/users/25afd81b-1d4f-4194-a4dd-c902fd784705",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8086",
+					"path": [
+						"api",
+						"users",
+						"25afd81b-1d4f-4194-a4dd-c902fd784705"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetById Copy",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -151,15 +188,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8082/api/ibovespa_assets",
+					"raw": "http://localhost:3000/scrapers/ibovespa-assets",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8082",
+					"port": "3000",
 					"path": [
-						"api",
-						"ibovespa_assets"
+						"scrapers",
+						"ibovespa-assets"
 					]
 				}
 			},
@@ -183,15 +220,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8082/api/ibovespa_assets",
+					"raw": "http://localhost/api/scrapers/ibovespa-assets",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8082",
 					"path": [
 						"api",
-						"ibovespa_assets"
+						"scrapers",
+						"ibovespa-assets"
 					]
 				}
 			},
@@ -212,14 +249,14 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8083/api/currency",
+					"raw": "http://localhost:3000/scrapers/currency",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8083",
+					"port": "3000",
 					"path": [
-						"api",
+						"scrapers",
 						"currency"
 					]
 				}
@@ -287,15 +324,44 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8084/api/selic",
+					"raw": "http://localhost:8084/scrapers/selic",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8084",
 					"path": [
-						"api",
+						"scrapers",
 						"selic"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "B3_COPORATES_INFO_POST",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"firstname\" : \"Marcelo\",\n   \"lastname\" : \"Santana\",\n   \"email\": \"tentativafc@gmail.com\",\n   \"password\": \"123456\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/scrapers/b3-corporates-info",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"scrapers",
+						"b3-corporates-info"
 					]
 				}
 			},
@@ -326,6 +392,90 @@
 							"key": "final_date",
 							"value": "20210101"
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Client Credentials POST",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"client_name\": \"Testingggg\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/client_credentials",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"client_credentials"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Token Post",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"client_id\": \"bc42b683-4cbf-4ea5-8109-b7206212b855\",\n    \"client_secret\": \"8bff96cd-1b64-4005-8ea0-2f2a109f6752\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8089/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8089",
+					"path": [
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Validate Token Post",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8089/validate_token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8089",
+					"path": [
+						"validate_token"
 					]
 				}
 			},
