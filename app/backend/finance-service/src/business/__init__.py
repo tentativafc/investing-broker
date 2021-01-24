@@ -11,6 +11,7 @@ from errors import IllegalArgumentException
 import uuid
 
 from models import AssetPortfolio, Portfolio
+from dtos import QuoteDto, PortfolioDto, AssetPortfolioDto
 
 TOP_50_ASSETS_IBOVESPA = ["ABEV3",
 "AZUL4",
@@ -71,11 +72,18 @@ class Business(object):
         df = self.data_access.get_rates_from_symbol(symbol, init_date, final_date, mt5.TIMEFRAME_H1)
         # to_json() does not serialize the dataframe index
         df_with_date = df.reset_index()
-        df_with_date['Date'] = df.index.astype(str)
-        list_dict = []
+        df_with_date['Date'] = df.index
+        list_dto = []
         for index, row in list(df_with_date.iterrows()):
-            list_dict.append(dict(row))
-        return list_dict
+            quoteDto = QuoteDto()
+            quoteDto.date = row.Date
+            quoteDto.min_price = row.Low
+            quoteDto.max_price = row.High
+            quoteDto.open_price = row.Open
+            quoteDto.close_price = row.Close
+            quoteDto.volume = row.Volume
+            list_dto.append(quoteDto)
+        return list_dto
 
     def createPortfolio(self, amount_assets: int):
         if amount_assets > 10:
@@ -88,7 +96,14 @@ class Business(object):
         
         portfolio = Portfolio(user_id=str(uuid.uuid4()), assets=assets, capm=1.0, beta=1.0)
         portfolio.save()
+
+        portfolioDto = PortfolioDto()
+        portfolioDto.user_id = portfolio.user_id
+        portfolioDto.assets = portfolio.assets
+        portfolioDto.capm = portfolio.capm
+        portfolioDto.beta = portfolio.beta
+        portfolioDto.created_at = portfolio.created_at
         
-        return portfolio.to_mongo().to_dict()
+        return portfolioDto
 
 

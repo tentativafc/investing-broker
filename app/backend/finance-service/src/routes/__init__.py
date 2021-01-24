@@ -3,26 +3,25 @@ __author__ = 'Marcelo Ortiz'
 
 
 from flask import request
-from flask_restful import Resource, Api, reqparse, abort
+from flask_restful import Resource, Api, reqparse, abort, marshal_with
 from marshmallow import Schema, fields
-import re
+from dtos import QuoteDto, PortfolioDto
 
 from datetime import datetime
 import pandas as pd
 from business import Business
-
 
 class QuotesGetSchema(Schema):
     symbol = fields.Str(required=True)
     init_date = fields.Date(required=True)
     final_date = fields.Date(required=True)    
 
-
 class Quotes(Resource):
     def __init__(self):
         self.getSchema = QuotesGetSchema()
         self.business = Business()
 
+    @marshal_with(QuoteDto.FIELDS)
     def get(self):
         errors = self.getSchema.validate(request.args)
         if errors:            
@@ -40,6 +39,7 @@ class Portfolio(Resource):
         self.getSchema = PortfolioGetSchema()
         self.business = Business()
 
+    @marshal_with(PortfolioDto.FIELDS)
     def get(self):
         errors = self.getSchema.validate(request.args)
         if errors:            
