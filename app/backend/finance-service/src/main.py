@@ -6,7 +6,7 @@ import routes
 app = Flask(__name__)
 api = Api(app)
 
-api.add_resource(routes.Portifolio, '/api/portifolio')
+api.add_resource(routes.Portfolio, '/api/portfolio')
 api.add_resource(routes.Quotes, '/api/quotes')
 api.add_resource(routes.Order, '/api/orders')
 

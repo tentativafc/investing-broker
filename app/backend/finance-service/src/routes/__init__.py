@@ -9,39 +9,44 @@ import re
 
 from datetime import datetime
 import pandas as pd
-import MetaTrader5 as mt5
-from ortisan_ta.dataaccess import DataItem, MetaTraderDataAccess
-import ortisan_ta.utils.analysis as ortisan_ta
+from business import Business
 
-class QuotesSchema(Schema):
+
+class QuotesGetSchema(Schema):
     symbol = fields.Str(required=True)
     init_date = fields.Date(required=True)
     final_date = fields.Date(required=True)    
 
+
 class Quotes(Resource):
     def __init__(self):
-        self.schema = QuotesSchema()
-        self.data_access = MetaTraderDataAccess()
+        self.getSchema = QuotesGetSchema()
+        self.business = Business()
 
     def get(self):
-        errors = self.schema.validate(request.args)
+        errors = self.getSchema.validate(request.args)
         if errors:            
             abort(400, message="Invalid parameters", cause=str(errors))   
         else:
-            search_filter = self.schema.load(request.args)
-            df = self.data_access.get_rates_from_symbol(search_filter['symbol'], pd.Timestamp(search_filter['init_date']), pd.Timestamp(search_filter['final_date']), mt5.TIMEFRAME_H1)
-            # to_json() does not serialize the dataframe index
-            df_with_date = df.reset_index()
-            df_with_date['Date'] = df.index.astype(str)
-            list_dict = []
-            for index, row in list(df_with_date.iterrows()):
-                list_dict.append(dict(row))
-            return list_dict
+            search_filter = self.getSchema.load(request.args)
+            return self.business.getQuotes(search_filter['symbol'], pd.Timestamp(search_filter['init_date']), pd.Timestamp(search_filter['final_date']))
 
 
-class Portifolio(Resource):
+class PortfolioGetSchema(Schema):
+    amount_assets = fields.Integer(required=True)
+
+class Portfolio(Resource):
+    def __init__(self):
+        self.getSchema = PortfolioGetSchema()
+        self.business = Business()
+
     def get(self):
-        return {'hello': 'world'}
+        errors = self.getSchema.validate(request.args)
+        if errors:            
+            abort(400, message="Invalid parameters", cause=str(errors))   
+        else:
+            search_filter = self.getSchema.load(request.args)
+            return self.business.createPortfolio(search_filter['amount_assets'])
 
 class Order(Resource):
     def get(self):

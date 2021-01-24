@@ -1,0 +1,21 @@
+version: '3'
+
+networks:
+  investing-network-windows:
+    driver: bridge
+
+services:
+  mongo-finance:
+    build: 
+      dockerfile: Dockerfile.mongodb
+      context: .
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongo
+      - MONGO_INITDB_ROOT_PASSWORD=123456
+      - MONGO_INITDB_DATABASE=finance
+    ports:
+      - 27021:27017
+    networks:
+      - investing-network-windows
+    volumes:
+      - ./docker/mongo-data-finance:/data/db
