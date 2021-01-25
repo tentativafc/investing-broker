@@ -1,21 +1,18 @@
 # coding=utf-8
-__author__ = " Marcelo Ortiz" 
+__author__ = " Marcelo Ortiz"
 
 import os
+from datetime import datetime
 
 from mongoengine import register_connection
 from mongoengine.document import Document, EmbeddedDocument
-from mongoengine.fields import DateTimeField
-from mongoengine.fields import FloatField
-from mongoengine.fields import IntField
-from mongoengine.fields import ReferenceField
-from mongoengine.fields import StringField
-from mongoengine.fields import ListField
-from mongoengine.fields import EmbeddedDocumentField
+from mongoengine.fields import (DateTimeField, EmbeddedDocumentField,
+                                FloatField, IntField, ListField,
+                                ReferenceField, StringField)
 
-from datetime import datetime
+register_connection(alias="default", name="finance-mongo", host="localhost", port=27021,
+                    username="mongo", password="123456", db="finance", authentication_source="admin")
 
-register_connection(alias="default", name="finance-mongo", host="localhost", port=27021, username="mongo", password="123456", db="finance", authentication_source="admin")
 
 class AssetPortfolio(EmbeddedDocument):
     symbol = StringField(required=True)
@@ -26,6 +23,7 @@ class AssetPortfolio(EmbeddedDocument):
     close_price = FloatField()
     volume = FloatField()
 
+
 class Portfolio(Document):
     user_id = StringField(required=True)
     assets = ListField(EmbeddedDocumentField(AssetPortfolio))
@@ -34,7 +32,7 @@ class Portfolio(Document):
     created_at = DateTimeField(default=datetime.utcnow)
     # Index on user_id
     meta = {
-        " indexes" : [
-            " user_id" 
+        " indexes": [
+            " user_id"
         ]
     }

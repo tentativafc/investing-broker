@@ -1,11 +1,12 @@
 # coding=utf-8
-__author__ = " Marcelo Ortiz" 
+__author__ = " Marcelo Ortiz"
 
 from flask_restful import fields
 
+
 class QuoteDto(object):
 
-    FIELDS = { 
+    FIELDS = {
         'date': fields.DateTime(dt_format='iso8601'),
         'min_price': fields.Float,
         'max_price': fields.Float,
@@ -22,17 +23,18 @@ class QuoteDto(object):
         self.close_price = 0.0
         self.volume = 0.0
 
+
 class AssetPortfolioDto(object):
-    FIELDS = { 
+    FIELDS = {
         'symbol': fields.String
     }
-    
+
     def __init__(self):
         self.symbol = None
 
 
 class PortfolioDto(object):
-    FIELDS = { 
+    FIELDS = {
         'user_id': fields.String,
         'assets': fields.Nested(AssetPortfolioDto.FIELDS),
         'capm': fields.Float,

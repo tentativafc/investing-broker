@@ -14,6 +14,7 @@ from dtos import AssetPortfolioDto, PortfolioDto, QuoteDto
 from errors import IllegalArgumentException
 from models import AssetPortfolio, Portfolio
 from ortisan_ta.dataaccess import DataItem, MetaTraderDataAccess
+from sklearn.cluster import KMeans
 
 REDIS_CORPORATES_INFO = "corporates_info"
 
@@ -96,31 +97,46 @@ class Business(object):
         if amount_assets > 10:
             raise IllegalArgumentException(
                 "Max amount of assets by portifolio is 10.")
-        
+
         final_date = datetime.now()
-        init_date = datetime.now() + timedelta(days=365)
+        init_date = datetime.now() - timedelta(days=365)
 
-        dfs = self.data_access.get_rates_from_symbol(TOP_50_ASSETS_IBOVESPA, init_date, final_date, mt5.TIMEFRAME_D1)
+        dfs = self.data_access.get_rates_from_symbols(
+            TOP_50_ASSETS_IBOVESPA, init_date, final_date, mt5.TIMEFRAME_D1)
 
-        # corporates_info_str = self.cache.get(REDIS_CORPORATES_INFO)
-        # corporates_info = json.loads(corporates_info_str)
-        # x = {symbol: ci["setorial_classes"] for ci in corporates_info for symbol in ci["assets_code"] if len(symbol) > 0}
-        return dfs
+        # Organize df where coluns are close of each asset
+        dict_closes = {symbol: df.Close for (symbol, df) in dfs.items()}
+        df_closes = pd.DataFrame.from_dict(dict_closes, orient='columns')
+        
+        # Create Analitical database
+        total_return = df_closes.iloc[-1] / df_closes.iloc[0] - 1
+        std = df_closes.std()
+        adb = pd.DataFrame({"RY": total_return, "SY": std})
 
-        # randomlist = random.sample(
-        #     range(0, len(TOP_50_ASSETS_IBOVESPA)), amount_assets)
-        # assets = [AssetPortfolio(symbol=TOP_50_ASSETS_IBOVESPA[i])
-        #           for i in randomlist]
+        # Kmeans create n cluster based on return and volatility
+        kmeans = KMeans(n_clusters=amount_assets, init='k-means++',
+                        n_init=10, random_state=24, max_iter=300)
+        pred_y = kmeans.fit_predict(adb)
 
-        # portfolio = Portfolio(user_id=str(uuid.uuid4()),
-        #                       assets=assets, capm=1.0, beta=1.0)
-        # portfolio.save()
+        # Maximum return over low volatile
+        adb['Volatile_Reward'] = adb['RY']/adb['SY']
+        adb['Cluster'] = pred_y
+        adb.sort_values(by=['Cluster'])
 
-        # portfolioDto = PortfolioDto()
-        # portfolioDto.user_id = portfolio.user_id
-        # portfolioDto.assets = portfolio.assets
-        # portfolioDto.capm = portfolio.capm
-        # portfolioDto.beta = portfolio.beta
-        # portfolioDto.created_at = portfolio.created_at
+        symbols = [adb[adb.Cluster == i].Volatile_Reward.idxmax()
+                     for i in range(0, amount_assets)]
 
-        # return portfolioDto
+        assets = [AssetPortfolio(symbol=symbol) for symbol in symbols]
+        
+        portfolio = Portfolio(user_id=str(uuid.uuid4()),
+                              assets=assets, capm=1.0, beta=1.0)
+        portfolio.save()
+
+        portfolioDto = PortfolioDto()
+        portfolioDto.user_id = portfolio.user_id
+        portfolioDto.assets = portfolio.assets
+        portfolioDto.capm = portfolio.capm
+        portfolioDto.beta = portfolio.beta
+        portfolioDto.created_at = portfolio.created_at
+
+        return portfolioDto

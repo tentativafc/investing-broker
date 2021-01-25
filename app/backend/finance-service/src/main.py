@@ -1,14 +1,13 @@
-from flask import Flask, make_response
-from flask_restful import Api
+import datetime
 
-from flask import json
-import routes
-
-from flask.json import JSONEncoder
 from bson import json_util
+from flask import Flask, json, make_response
+from flask.json import JSONEncoder
+from flask_restful import Api
 from mongoengine.base import BaseDocument
 from mongoengine.queryset.base import BaseQuerySet
-import datetime
+
+import routes
 
 app = Flask(__name__)
 api = Api(app)
