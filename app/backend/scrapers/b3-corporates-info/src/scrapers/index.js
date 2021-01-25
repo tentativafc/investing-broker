@@ -2,9 +2,16 @@ import axios from "axios";
 import fetch from "node-fetch";
 import cheerio from "cheerio";
 import { from, of, combineLatest } from "rxjs";
-import { map, mergeMap, toArray, retry, catchError, throwError } from "rxjs/operators";
+import {
+  map,
+  mergeMap,
+  toArray,
+  retry,
+  catchError,
+  throwError,
+} from "rxjs/operators";
 import { CorporateInfo } from "../models";
-import { AXIOS_TIMEOUT_MS } from "../config";
+import { AXIOS_TIMEOUT_MS, cache } from "../config";
 const LETTERS = [
   "A",
   "B",
@@ -39,7 +46,7 @@ const fetchAxios = async (url) => {
 };
 
 const fetchText = async (url) => {
-  const resp = await fetch(url, {timeout: AXIOS_TIMEOUT_MS});
+  const resp = await fetch(url, { timeout: AXIOS_TIMEOUT_MS });
   return resp.text();
 };
 
@@ -50,7 +57,7 @@ class Scraper {
         let url = `http://bvmf.bmfbovespa.com.br/cias-listadas/empresas-listadas/BuscaEmpresaListada.aspx?Letra=${letter}&idioma=pt-br`;
         return fetchText(url);
       }),
-      catchError(err => {
+      catchError((err) => {
         console.log("Error on fetch html...", err);
         return throwError(err);
       }),
@@ -112,7 +119,8 @@ class Scraper {
           table_sumary_info
         )
           .text()
-          .split("/").map((sector) => sector.trim())
+          .split("/")
+          .map((sector) => sector.trim());
 
         let update_data = {
           cnpj_number,
@@ -129,14 +137,22 @@ class Scraper {
           })
         );
       }),
-      catchError(err => {
+      catchError((err) => {
         console.log("Error on parse detailed info...", err);
         return throwError(err);
       }),
       mergeMap(([filter, updated]) => {
-        return CorporateInfo.find(filter);
+        return CorporateInfo.findOne(filter);
       }),
-      toArray()
+      toArray(),
+      map((corporates) => {
+        cache.set("corporates_info", JSON.stringify(corporates), "EX", 3600);        
+        return corporates;
+      }),
+      catchError((err) => {
+        console.log("Error put cache...", err);
+        return throwError(err);
+      })
     );
   }
 }

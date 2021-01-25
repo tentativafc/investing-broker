@@ -2,8 +2,8 @@ import axios from "axios";
 import { CurrencyPrice } from "../models";
 import moment from "moment";
 import { from } from "rxjs";
-import { filter, mergeMap, toArray, retry } from "rxjs/operators";
-import { AXIOS_TIMEOUT_MS } from "../config";
+import { filter, map, mergeMap, toArray, retry } from "rxjs/operators";
+import { AXIOS_TIMEOUT_MS, cache } from "../config";
 
 const DOLAR = 61;
 const EURO = 222;
@@ -52,7 +52,16 @@ class Scraper {
           upsert: true,
         });
       }),
-      toArray()
+      toArray(),
+      map((currency_prices) => {
+        cache.set(
+          "currency_prices",
+          JSON.stringify(currency_prices),
+          "EX",
+          3600
+        );
+        return currency_prices;
+      })
     );
   }
 }

@@ -1,5 +1,6 @@
 import { IbovespaAssets } from "../models/index";
 import Scraper from "../scrapers/index";
+import { cache } from "../config";
 
 const API_PATH = "/scrapers/ibovespa-assets";
 
@@ -10,6 +11,19 @@ const get = async (req, res, next) => {
   } catch (err) {
     res.json(500, { message: "Error get ibovespa assets", cause: err });
   }
+};
+
+const get_redis = (req, res, next) => {
+  cache.get("ibovespa_assets", (err, ibovespa_assets_str) => {
+    if (err) {
+      res.json(500, {
+        message: "Error to load cache.",
+        cause: err,
+      });
+    } else {
+      res.json(JSON.parse(ibovespa_assets_str));
+    }
+  });
 };
 
 const post = (req, res, next) => {
@@ -24,6 +38,7 @@ const post = (req, res, next) => {
 
 function Routes(server) {
   server.get(API_PATH, get);
+  server.get(API_PATH + "/redis", get_redis);
   server.post(API_PATH, post);
 }
 

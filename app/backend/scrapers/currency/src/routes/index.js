@@ -1,6 +1,7 @@
 import moment from "moment";
 import { CurrencyPrice } from "../models";
 import Scraper from "../scrapers";
+import { cache } from "../config";
 
 const API_PATH = "/scrapers/currency";
 
@@ -28,6 +29,19 @@ const get = async (req, res, next) => {
   }
 };
 
+const get_redis = (req, res, next) => {
+  cache.get("currency_prices", (err, currency_prices_str) => {
+    if (err) {
+      res.json(500, {
+        message: "Error to load cache.",
+        cause: err,
+      });
+    } else {
+      res.json(JSON.parse(currency_prices_str));
+    }
+  });
+};
+
 const post = (req, res, next) => {
   let scraper = new Scraper();
   scraper.load().subscribe(
@@ -42,6 +56,7 @@ const post = (req, res, next) => {
 
 function Routes(server) {
   server.get(API_PATH, get);
+  server.get(API_PATH + "/redis", get_redis);
   server.post(API_PATH, post);
 }
 

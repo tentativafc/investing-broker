@@ -3,7 +3,7 @@ import { Selic } from "../models/index";
 import moment from "moment";
 import { from, of } from "rxjs";
 import { map, mergeMap, toArray, retry } from "rxjs/operators";
-import { AXIOS_TIMEOUT_MS } from "../config";
+import { AXIOS_TIMEOUT_MS, cache } from "../config";
 
 const fetchData = async (url) => {
   const { data } = await axios.get(url, { timeout: AXIOS_TIMEOUT_MS });
@@ -50,7 +50,6 @@ class Scraper {
 
           selic_prices.push(selic_price);
         });
-
         // Return new observer
         return from(selic_prices).pipe(map((selic_price) => selic_price));
       }),
@@ -61,7 +60,11 @@ class Scraper {
           upsert: true,
         });
       }),
-      toArray()
+      toArray(),
+      map((selic_prices) => {
+        cache.set("selic_prices", JSON.stringify(selic_prices), "EX", 3600);
+        return selic_prices;
+      })
     );
   }
 }

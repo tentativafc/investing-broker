@@ -5,11 +5,15 @@
         "port": "27017",
         "user": "mongouser",
         "password": "mongopass",
-        "database": "currency"    
+        "database": "currency"
+      },
+      "redis": {
+        "host": "redis-ip-service",
+        "port": "6379",
+        "time_to_retry_in_ms": 1000  
       },
       "axios":  {
           "timeout_in_ms": 60000
-
       }
     }
   }

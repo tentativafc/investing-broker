@@ -2,8 +2,8 @@ import axios from "axios";
 import cheerio from "cheerio";
 import { Asset, IbovespaAssets } from "../models/index";
 import { of } from "rxjs";
-import { mergeMap, retry } from "rxjs/operators";
-import { AXIOS_TIMEOUT_MS } from "../config";
+import { map, mergeMap, retry } from "rxjs/operators";
+import { AXIOS_TIMEOUT_MS, cache } from "../config";
 
 const url =
   "http://bvmf.bmfbovespa.com.br/indices/ResumoCarteiraTeorica.aspx?Indice=IBOV&idioma=pt-br";
@@ -74,6 +74,15 @@ class Scraper {
           new: true,
           upsert: true, // Make this update into an upsert
         });
+      }),
+      map((ibovespa_assets) => {
+        cache.set(
+          "ibovespa_assets",
+          JSON.stringify(ibovespa_assets),
+          "EX",
+          3600
+        );
+        return ibovespa_assets;
       })
     );
   }

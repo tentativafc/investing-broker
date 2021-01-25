@@ -7,6 +7,11 @@
       "password": "mongopass",
       "database": "selic"
     },
+    "redis": {
+      "host": "redis",
+      "port": "6379",
+      "time_to_retry_in_ms": 1000  
+    },
     "axios": {
       "timeout_in_ms": 60000
     }
