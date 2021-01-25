@@ -76,6 +76,11 @@ services:
     volumes:
       - ./docker/mongo-data-selic:/data/db
 
+  redis:
+    image: 'redis:6.0.10-alpine'
+    ports:
+      - 6379:6379
+
   mongo-b3-corporates-info:
     build: 
       dockerfile: Dockerfile.mongodb
@@ -91,137 +96,137 @@ services:
     volumes:
       - ./docker/mongo-data-b3-coporates-info:/data/db
 
-  sts-service:
-    build: 
-      dockerfile: Dockerfile
-      context: ./backend/sts-service
-    environment:
-      - DB_CONNECTION=host=postgres-sts user=postgres password=123456 dbname=postgres port=5432
-    ports:
-      - 8089:8080    
-      - 50051:50051
-    networks:
-      - investing-network
-    volumes: 
-      - ./backend/sts-service:/app
-    depends_on: 
-      - postgres-sts
+  # sts-service:
+  #   build: 
+  #     dockerfile: Dockerfile
+  #     context: ./backend/sts-service
+  #   environment:
+  #     - DB_CONNECTION=host=postgres-sts user=postgres password=123456 dbname=postgres port=5432
+  #   ports:
+  #     - 8089:8080    
+  #     - 50051:50051
+  #   networks:
+  #     - investing-network
+  #   volumes: 
+  #     - ./backend/sts-service:/app
+  #   depends_on: 
+  #     - postgres-sts
 
-  user-service:
-    build: 
-      dockerfile: Dockerfile
-      context: ./backend/user-service
-    environment:
-      - DB_CONNECTION=host=postgres-user user=postgres password=123456 dbname=postgres port=5432
-      - DB_CONNECTION_STS=host=postgres-sts user=postgres password=123456 dbname=postgres port=5432
-      - GRPC_STS=sts-service:50051
-    ports:
-      - 8081:8081    
-    networks:
-      - investing-network
-    volumes: 
-      - ./backend/user-service:/app
-    depends_on: 
-      - postgres-user
-      - sts-service
+  # user-service:
+  #   build: 
+  #     dockerfile: Dockerfile
+  #     context: ./backend/user-service
+  #   environment:
+  #     - DB_CONNECTION=host=postgres-user user=postgres password=123456 dbname=postgres port=5432
+  #     - DB_CONNECTION_STS=host=postgres-sts user=postgres password=123456 dbname=postgres port=5432
+  #     - GRPC_STS=sts-service:50051
+  #   ports:
+  #     - 8081:8081    
+  #   networks:
+  #     - investing-network
+  #   volumes: 
+  #     - ./backend/user-service:/app
+  #   depends_on: 
+  #     - postgres-user
+  #     - sts-service
 
-  scraper-ibovespa-assets:
-    build:
-      dockerfile: Dockerfile.api
-      context: ./backend/scrapers/ibovespa-assets
-    ports:
-      - '8082:3000'
-    environment:
-      - NODE_ENV=docker-compose
-    networks:
-      - investing-network
-    volumes:
-      - /app/node_modules
-      - ./backend/scrapers/ibovespa-assets:/app
-    depends_on:
-      - mongo-ibovespa-assets
+  # scraper-ibovespa-assets:
+  #   build:
+  #     dockerfile: Dockerfile.api
+  #     context: ./backend/scrapers/ibovespa-assets
+  #   ports:
+  #     - '8082:3000'
+  #   environment:
+  #     - NODE_ENV=docker-compose
+  #   networks:
+  #     - investing-network
+  #   volumes:
+  #     - /app/node_modules
+  #     - ./backend/scrapers/ibovespa-assets:/app
+  #   depends_on:
+  #     - mongo-ibovespa-assets
 
-  scraper-currency:
-    build:
-      dockerfile: Dockerfile.api
-      context: ./backend/scrapers/currency
-    ports:
-      - '8083:3000'
-    environment:
-      - NODE_ENV=docker-compose
-    networks:
-      - investing-network
-    volumes: 
-      - /app/node_modules
-      - ./backend/scrapers/currency:/app
-    depends_on: 
-      - mongo-currency
+  # scraper-currency:
+  #   build:
+  #     dockerfile: Dockerfile.api
+  #     context: ./backend/scrapers/currency
+  #   ports:
+  #     - '8083:3000'
+  #   environment:
+  #     - NODE_ENV=docker-compose
+  #   networks:
+  #     - investing-network
+  #   volumes: 
+  #     - /app/node_modules
+  #     - ./backend/scrapers/currency:/app
+  #   depends_on: 
+  #     - mongo-currency
 
-  scraper-selic:
-    build:
-      dockerfile: Dockerfile.api
-      context: ./backend/scrapers/selic
-    ports:
-      - '8084:3000'
-    environment:
-      - NODE_ENV=docker-compose
-    networks:
-      - investing-network
-    volumes:
-      - /app/node_modules
-      - ./backend/scrapers/selic:/app
-    depends_on:
-      - mongo-ibovespa-assets
+  # scraper-selic:
+  #   build:
+  #     dockerfile: Dockerfile.api
+  #     context: ./backend/scrapers/selic
+  #   ports:
+  #     - '8084:3000'
+  #   environment:
+  #     - NODE_ENV=docker-compose
+  #   networks:
+  #     - investing-network
+  #   volumes:
+  #     - /app/node_modules
+  #     - ./backend/scrapers/selic:/app
+  #   depends_on:
+  #     - mongo-ibovespa-assets
 
-  scraper-b3-corporates-info:
-    build:
-      dockerfile: Dockerfile.api
-      context: ./backend/scrapers/b3-corporates-info
-    ports:
-      - '8085:3000'
-    environment:
-      - NODE_ENV=docker-compose
-    networks:
-      - investing-network
-    volumes:
-      - /app/node_modules
-      - ./backend/scrapers/b3-corporates-info:/app
-    depends_on:
-      - mongo-b3-corporates-info
+  # scraper-b3-corporates-info:
+  #   build:
+  #     dockerfile: Dockerfile.api
+  #     context: ./backend/scrapers/b3-corporates-info
+  #   ports:
+  #     - '8085:3000'
+  #   environment:
+  #     - NODE_ENV=docker-compose
+  #   networks:
+  #     - investing-network
+  #   volumes:
+  #     - /app/node_modules
+  #     - ./backend/scrapers/b3-corporates-info:/app
+  #   depends_on:
+  #     - mongo-b3-corporates-info
 
-  frontend:
-    restart: always
-    build: 
-      dockerfile: Dockerfile
-      context: ./frontend/app
-    environment:
-      - VUE_APP_API_URL=http://localhost:80/api/
-    ports:
-      - '8080:8080'
-    networks:
-      - investing-network
-    volumes: 
-      - /app/node_modules
-      - ./frontend/app:/app
-    depends_on: 
-      - user-service
+  # frontend:
+  #   restart: always
+  #   build: 
+  #     dockerfile: Dockerfile
+  #     context: ./frontend/app
+  #   environment:
+  #     - VUE_APP_API_URL=http://localhost:80/api/
+  #   ports:
+  #     - '8080:8080'
+  #   networks:
+  #     - investing-network
+  #   volumes: 
+  #     - /app/node_modules
+  #     - ./frontend/app:/app
+  #   depends_on: 
+  #     - user-service
 
-  nginx:
-    image: nginx:1.19.6
-    restart: always    
-    ports: 
-      - 80:80
-      - 443:443
-    networks:
-      - investing-network
-    volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - sts-service
-      - user-service
-      - scraper-ibovespa-assets
-      - scraper-currency
-      - scraper-selic
-      - scraper-b3-corporates-info
-      - frontend
+  # nginx:
+  #   image: nginx:1.19.6
+  #   restart: always    
+  #   ports: 
+  #     - 80:80
+  #     - 443:443
+  #   networks:
+  #     - investing-network
+  #   volumes:
+  #     - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+  #   depends_on:
+  #     - sts-service
+  #     - user-service
+  #     - scraper-ibovespa-assets
+  #     - scraper-currency
+  #     - scraper-selic
+  #     - scraper-b3-corporates-info
+  #     - frontend
       
