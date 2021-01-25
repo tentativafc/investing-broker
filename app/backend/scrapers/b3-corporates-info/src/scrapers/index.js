@@ -1,7 +1,8 @@
 import axios from "axios";
+import fetch from "node-fetch";
 import cheerio from "cheerio";
 import { from, of, combineLatest } from "rxjs";
-import { map, mergeMap, toArray, retry } from "rxjs/operators";
+import { map, mergeMap, toArray, retry, catchError, throwError } from "rxjs/operators";
 import { CorporateInfo } from "../models";
 import { AXIOS_TIMEOUT_MS } from "../config";
 const LETTERS = [
@@ -32,9 +33,14 @@ const LETTERS = [
 
 const REGEX_CVM_CODE = /.*codigoCvm=(\d+)/;
 
-const fetchHtml = async (url) => {
+const fetchAxios = async (url) => {
   const { data } = await axios.get(url, { timeout: AXIOS_TIMEOUT_MS });
   return data;
+};
+
+const fetchText = async (url) => {
+  const resp = await fetch(url, {timeout: AXIOS_TIMEOUT_MS});
+  return resp.text();
 };
 
 class Scraper {
@@ -42,7 +48,11 @@ class Scraper {
     return from(LETTERS).pipe(
       mergeMap((letter) => {
         let url = `http://bvmf.bmfbovespa.com.br/cias-listadas/empresas-listadas/BuscaEmpresaListada.aspx?Letra=${letter}&idioma=pt-br`;
-        return fetchHtml(url);
+        return fetchText(url);
+      }),
+      catchError(err => {
+        console.log("Error on fetch html...", err);
+        return throwError(err);
       }),
       //retry 2 times on error
       retry(2),
@@ -78,7 +88,7 @@ class Scraper {
       mergeMap((corporate) => {
         let url = `http://bvmf.bmfbovespa.com.br/pt-br/mercados/acoes/empresas/ExecutaAcaoConsultaInfoEmp.asp?CodCVM=${corporate.cvm_code}`;
         console.log(`Scraping corporate ${corporate.name} - ${url}`);
-        return combineLatest(of(corporate), of(url), fetchHtml(url));
+        return combineLatest(of(corporate), of(url), fetchText(url));
       }),
       //retry 2 times on error
       retry(2),
@@ -102,13 +112,13 @@ class Scraper {
           table_sumary_info
         )
           .text()
-          .split("/");
+          .split("/").map((sector) => sector.trim())
 
         let update_data = {
           cnpj_number,
-          assets_code,
+          assets_code: [...new Set(assets_code)],
           main_activity,
-          setorial_classes,
+          setorial_classes: [...new Set(setorial_classes)],
           link: url,
         };
         let filter = { cvm_code: corporate.cvm_code };
@@ -118,6 +128,10 @@ class Scraper {
             $set: update_data,
           })
         );
+      }),
+      catchError(err => {
+        console.log("Error on parse detailed info...", err);
+        return throwError(err);
       }),
       mergeMap(([filter, updated]) => {
         return CorporateInfo.find(filter);
