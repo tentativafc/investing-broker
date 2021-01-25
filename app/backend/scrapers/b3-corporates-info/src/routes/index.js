@@ -17,7 +17,7 @@ const get = async (req, res, next) => {
 };
 
 const get_redis =  (req, res, next) => {
-  cache.get("setorial_classes_by_asset", (err, corporates_info_str) => {
+  cache.get("corporates_info", (err, corporates_info_str) => {
     if (err) {
       res.json(500, {
         message: "Error to load cache.",

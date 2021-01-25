@@ -146,7 +146,7 @@ class Scraper {
       }),
       toArray(),
       map((corporates) => {
-        cache.set("corporates_info", JSON.stringify(corporates), "EX", 3600);        
+        cache.set("corporates_info", JSON.stringify(corporates));        
         return corporates;
       }),
       catchError((err) => {

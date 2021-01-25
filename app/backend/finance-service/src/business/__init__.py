@@ -1,19 +1,19 @@
 # coding=utf-8
 __author__ = 'Marcelo Ortiz'
 
+import json
 import random
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import MetaTrader5 as mt5
 import ortisan_ta.utils.analysis as ortisan_ta
 import pandas as pd
+import redis
 from dtos import AssetPortfolioDto, PortfolioDto, QuoteDto
 from errors import IllegalArgumentException
 from models import AssetPortfolio, Portfolio
 from ortisan_ta.dataaccess import DataItem, MetaTraderDataAccess
-import redis
-import json
 
 REDIS_CORPORATES_INFO = "corporates_info"
 
@@ -96,16 +96,16 @@ class Business(object):
         if amount_assets > 10:
             raise IllegalArgumentException(
                 "Max amount of assets by portifolio is 10.")
-        # create a dummy Portfolio
-        # todo use optimization algorithm to create
-        # Generate 5 random numbers between 10 and 30
+        
+        final_date = datetime.now()
+        init_date = datetime.now() + timedelta(days=365)
 
-        corporates_info_str = self.cache.get(REDIS_CORPORATES_INFO)
-        corporates_info = json.loads(corporates_info_str)
+        dfs = self.data_access.get_rates_from_symbol(TOP_50_ASSETS_IBOVESPA, init_date, final_date, mt5.TIMEFRAME_D1)
 
-        x = {symbol: ci["setorial_classes"] for ci in corporates_info for symbol in ci["assets_code"] if len(symbol) > 0}
-
-        return x
+        # corporates_info_str = self.cache.get(REDIS_CORPORATES_INFO)
+        # corporates_info = json.loads(corporates_info_str)
+        # x = {symbol: ci["setorial_classes"] for ci in corporates_info for symbol in ci["assets_code"] if len(symbol) > 0}
+        return dfs
 
         # randomlist = random.sample(
         #     range(0, len(TOP_50_ASSETS_IBOVESPA)), amount_assets)

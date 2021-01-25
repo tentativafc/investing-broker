@@ -52,8 +52,7 @@ class Portfolio(Resource):
                 search_filter = self.getSchema.load(request.args)
                 return self.business.createPortfolio(search_filter['amount_assets'])
         except Exception as exc:
-            if isinstance(exc, IllegalArgumentException):                    
-                print(dir(exc))
+            if isinstance(exc, IllegalArgumentException):
                 abort(400, message=str(exc))
             else:
                 abort(500, message="Error to create portfolio.", cause=exc)
