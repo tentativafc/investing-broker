@@ -42,7 +42,7 @@ class Portfolio(Resource):
         self.getSchema = PortfolioGetSchema()
         self.business = Business()
 
-    @marshal_with(PortfolioDto.FIELDS)
+    # @marshal_with(PortfolioDto.FIELDS)
     def get(self):
         try:
             errors = self.getSchema.validate(request.args)
