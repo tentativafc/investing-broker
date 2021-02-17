@@ -16,60 +16,6 @@ from models import AssetPortfolio, Portfolio
 from ortisan_ta.dataaccess import DataItem, MetaTraderDataAccess
 from sklearn.cluster import KMeans
 
-REDIS_CORPORATES_INFO = "corporates_info"
-
-TOP_50_ASSETS_IBOVESPA = ["ABEV3",
-                          "AZUL4",
-                          "B3SA3",
-                          "BBAS3",
-                          "BBDC4",
-                          "BBSE3",
-                          "BPAC11",
-                          "BRDT3",
-                          "BRFS3",
-                          "BRML3",
-                          "BTOW3",
-                          "CCRO3",
-                          "CIEL3",
-                          "CMIG4",
-                          "COGN3",
-                          "CSNA3",
-                          "CVCB3",
-                          "CYRE3",
-                          "ELET3",
-                          "EQTL3",
-                          "GGBR4",
-                          "GNDI3",
-                          "GOAU4",
-                          "GOLL4",
-                          "IRBR3",
-                          "ITSA4",
-                          "ITUB4",
-                          "JBSS3",
-                          "KLBN11",
-                          "LAME4",
-                          "LREN3",
-                          "MGLU3",
-                          "MRFG3",
-                          "MULT3",
-                          "NTCO3",
-                          "PETR3",
-                          "PETR4",
-                          "PRIO3",
-                          "RADL3",
-                          "RAIL3",
-                          "RENT3",
-                          "SBSP3",
-                          "SULA11",
-                          "SUZB3",
-                          "TOTS3",
-                          "UGPA3",
-                          "USIM5",
-                          "VALE3",
-                          "VVAR3",
-                          "WEGE3"]
-
-
 class Business(object):
     def __init__(self):
         self.data_access = MetaTraderDataAccess()
